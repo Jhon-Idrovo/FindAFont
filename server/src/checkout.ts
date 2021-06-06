@@ -1,5 +1,4 @@
 import { stripe } from "./";
-import Stripe from "stripe";
 
 //this creates a checkout session we can use in our frontend app to checkout
 export async function createStripeCheckout(priceId: string) {
