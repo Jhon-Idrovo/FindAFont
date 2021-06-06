@@ -38,6 +38,15 @@ function Tests() {
     });
   };
 
+  //SAVE LIKED FONTS
+  const [liked, setLiked] = useState([]);
+  const saveFonts = () => {
+    //save the current font(s) when "SAVE THIS" is pressed
+    setLiked((prev) => [...prev, texts.map((t) => t.fontIndex)]);
+  };
+
+  //SEE SELECTIONS
+
   return (
     <div>
       <div>
@@ -64,6 +73,7 @@ function Tests() {
           })}
       </div>
       <button onClick={() => handleFontChange(+1)}>Next</button>
+      <button onClick={saveFonts}>Save</button>
     </div>
   );
 }
