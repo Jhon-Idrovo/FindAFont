@@ -5,7 +5,7 @@ import axios from "axios";
 
 function Tests() {
   //FULL FONTS LIST
-  const [fonts, setFonts] = useState([]);
+  const [fonts, setFonts] = useState(false);
   const GoogleFontsAPIKey = "AIzaSyBURN0QbZlqbqoUPbIKdRhcDkH_Xz2taAs";
   async function fetchFontsList() {
     const res = await axios.get(
@@ -18,68 +18,66 @@ function Tests() {
   }
   useEffect(() => {
     fetchFontsList();
-    return () => {};
   }, []);
 
-  //ACTIVE TEXTAREA
-  const [activeText, setActiveText] = useState(0);
-
-  //SELECTED FONT (as an index)
-  const [activeFonts, setActiveFonts] = useState([0, 0]);
-  //[filters for text 1, filter for text2,...]
-  const [filters, setFilters] = useState([]);
-
-  const handleFontChange = (change, textIndex) => {
-    const nextFont = fonts[activeFonts[textIndex] + change];
+  const [texts, setTexts] = useState([
+    { fontIndex: 0, filters: [] },
+    { fontIndex: 0, filters: [] },
+  ]);
+  const [activeTextIndex, setActiveTextIndex] = useState(0);
+  const handleFontChange = (change) => {
+    const currentText = texts[activeTextIndex];
+    const nextFont = fonts[currentText.fontIndex + change];
     //check if the font meets the restrictions
-    if (filters[textIndex].includes(nextFont.category))
-      return handleFontChange(change, textIndex);
-    setActiveFonts((prev) => {
-      prev[textIndex] = activeFonts[textIndex] + change;
-      return prev;
+    if (currentText.filters.includes(nextFont.category))
+      return handleFontChange(change);
+    setTexts((prev) => {
+      prev[activeTextIndex].fontIndex =
+        prev[activeTextIndex].fontIndex + change;
+      return JSON.parse(JSON.stringify(prev));
     });
   };
 
   return (
     <div>
       <div>
-        {fonts?.map(({ family }) => (
-          <link
-            rel="stylesheet"
-            href={`https://fonts.googleapis.com/css?family=${family}`}
-          />
-        ))}
-      </div>
-      <div>
         {fonts
-          ? activeFonts.map((fontIndex, index) => {
-              console.log(fontIndex, index, fonts);
-              return (
-                <TextFrame
-                  index={index}
-                  activate={setActiveText}
-                  font={fonts[fontIndex]}
-                  key={index}
-                />
-              );
-            })
+          ? fonts.map(({ family }) => (
+              <link
+                rel="stylesheet"
+                href={`https://fonts.googleapis.com/css?family=${family}`}
+              />
+            ))
           : null}
       </div>
-      <button onClick={() => handleFontChange(+1, activeText)}>Next</button>
+      <div>
+        {fonts &&
+          texts.map((text, index) => {
+            return (
+              <TextFrame
+                index={index}
+                setActiveTextIndex={setActiveTextIndex}
+                font={fonts[text.fontIndex]}
+                key={index}
+              />
+            );
+          })}
+      </div>
+      <button onClick={() => handleFontChange(+1)}>Next</button>
     </div>
   );
 }
 
 export default Tests;
 
-function TextFrame({ font, activate, index }) {
+function TextFrame({ font, setActiveTextIndex, index }) {
   console.log(font);
 
   //variants and textarea
   return (
     <div>
       <textarea
-        onClick={() => activate(index)}
+        onClick={() => setActiveTextIndex(index)}
         style={{
           fontFamily: `${font.family},serif`,
         }}
