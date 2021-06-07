@@ -2,32 +2,47 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function Home() {
-  //All fonts
-  const [fonts, setFonts] = useState([]);
-  const GoogleFontsAPIKey = "AIzaSyBURN0QbZlqbqoUPbIKdRhcDkH_Xz2taAs";
-  async function fetchFontsList() {
-    const res = await axios.get(
-      `https://www.googleapis.com/webfonts/v1/webfonts?key=${GoogleFontsAPIKey}`
-    );
-    console.log(res);
-    if (res.status === 200) {
-      setFonts(res.data.items);
-    }
-  }
-  useEffect(() => {
-    fetchFontsList();
-    return () => {};
-  }, []);
+import TextShowcase from "../components/TextShowcase";
+import useFonts from "../hooks/useFonts";
 
-  //SELECTED FONT
-  const [activeFont, setActiveFont] = useState(0);
-  const [filters, setFilters] = useState([]);
+export default function Home() {
+  const { fonts, isLoadingFonts, error } = useFonts();
+  //------------------------------------
+  const [texts, setTexts] = useState([
+    { fontIndex: 0, filters: [] },
+    { fontIndex: 0, filters: [] },
+  ]);
+  const [activeTextIndex, setActiveTextIndex] = useState(0);
   const handleFontChange = (change) => {
-    const nextFont = fonts[activeFont + change];
+    const currentText = texts[activeTextIndex];
+    const nextFont = fonts[currentText.fontIndex + change];
     //check if the font meets the restrictions
-    if (filters.includes(nextFont.category)) return handleFontChange(+1);
-    setActiveFont((prev) => prev + change);
+    if (currentText.filters.includes(nextFont.category))
+      return handleFontChange(change);
+    setTexts((prev) => {
+      prev[activeTextIndex].fontIndex =
+        prev[activeTextIndex].fontIndex + change;
+      return JSON.parse(JSON.stringify(prev));
+    });
+  };
+
+  //SAVE LIKED FONTS
+  const [liked, setLiked] = useState([]);
+  const saveFonts = () => {
+    //save the current font(s) when "SAVE THIS" is pressed
+    setLiked((prev) => [...prev, texts.map((t) => t.fontIndex)]);
+  };
+
+  //TEXTS CONFIG
+  const [isConfigOpen, setIsConfigOpen] = useState(false);
+  const [config, setConfig] = useState({ bgCol: "#000000", txtCol: "#FFFFFF" });
+  const changeTxtCol = (e) => {
+    const newCol = e.target.value;
+    setConfig((prev) => ({ ...prev, txtCol: newCol }));
+  };
+  const changeBgCol = (e) => {
+    const newCol = e.target.value;
+    setConfig((prev) => ({ ...prev, bgCol: newCol }));
   };
 
   return (
@@ -65,27 +80,54 @@ export default function Home() {
         >
           NEXT
         </button>
-        <button className="absolute bottom-2 w-full flex justify-center">
+        <button
+          onClick={saveFonts}
+          className="absolute bottom-2 w-full flex justify-center"
+        >
           SAVE THIS
         </button>
 
-        <div className="flex absolute top-16 bottom-16 right-20 left-28 border-2 border-txt-base">
-          <div className="p-2 flex flex-col justify-center items-center">
-            <h6>Variants:</h6>
-            <ul>
-              {fonts[activeFont]?.variants.map((v) => (
-                <li>{v}</li>
-              ))}
+        <div className="flex flex-col absolute top-16 bottom-16 right-20 left-28 border-2 border-txt-base">
+          {fonts
+            ? texts.map((t, index) => (
+                <TextShowcase
+                  config={config}
+                  index={index}
+                  font={fonts[t.fontIndex]}
+                  setActive={setActiveTextIndex}
+                />
+              ))
+            : null}
+          <button
+            onClick={() => setIsConfigOpen((prev) => !prev)}
+            className="absolute -top-8 right-0"
+          >
+            ...
+            <ul
+              className={`absolute top-8 right-0 overflow-hidden transition-all ${
+                isConfigOpen ? "max-h-screen" : "max-h-0"
+              }`}
+            >
+              <li>
+                Font Color
+                <input
+                  value={config.txtCol}
+                  onChange={changeTxtCol}
+                  type="color"
+                  id="font-color-picker"
+                />
+              </li>
+              <li>
+                Background Color
+                <input
+                  value={config.bgCol}
+                  onChange={changeBgCol}
+                  type="color"
+                  id="bg-color-picker"
+                />
+              </li>
             </ul>
-          </div>
-          <textarea
-            className="text-txt-base bg-base"
-            style={{
-              fontFamily: `${fonts[activeFont]?.family},serif`,
-            }}
-            cols="30"
-            rows="10"
-          ></textarea>
+          </button>
         </div>
       </main>
     </>

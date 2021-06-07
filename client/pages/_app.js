@@ -9,6 +9,10 @@ export const stripePromise = loadStripe(
   "pk_test_51Iyx5dHhEOvz8JaOeTtCEBXMSff06WroQUgQ3ipHwrJpERmx1uPd2S50weOJFRo6JRxxpbrUXvViNMudhE0hR9S700hzAOsrqs"
 );
 
+import { QueryClient, QueryClientProvider } from "react-query";
+
+// Create a react-query client
+const queryClient = new QueryClient();
 export default function App({ Component, pageProps }) {
   return (
     <>
@@ -21,10 +25,12 @@ export default function App({ Component, pageProps }) {
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <Elements stripe={stripePromise}>
-        <NavBar />
-        <Component {...pageProps} />
-      </Elements>
+      <QueryClientProvider client={queryClient}>
+        <Elements stripe={stripePromise}>
+          <NavBar />
+          <Component {...pageProps} />
+        </Elements>
+      </QueryClientProvider>
     </>
   );
 }
