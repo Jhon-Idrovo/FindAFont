@@ -6,9 +6,6 @@ import NavBar from "../components/NavBar";
 //stripe
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-//firebase
-import { FirebaseAppProvider } from "reactfire";
-import { firebaseConfig } from "../lib/firebase";
 //react query
 import { QueryClient, QueryClientProvider } from "react-query";
 
@@ -30,14 +27,12 @@ export default function App({ Component, pageProps }) {
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <FirebaseAppProvider firebaseConfig={firebaseConfig}>
-        <QueryClientProvider client={queryClient}>
-          <Elements stripe={stripePromise}>
-            <NavBar />
-            <Component {...pageProps} />
-          </Elements>
-        </QueryClientProvider>
-      </FirebaseAppProvider>
+      <QueryClientProvider client={queryClient}>
+        <Elements stripe={stripePromise}>
+          <NavBar />
+          <Component {...pageProps} />
+        </Elements>
+      </QueryClientProvider>
     </>
   );
 }

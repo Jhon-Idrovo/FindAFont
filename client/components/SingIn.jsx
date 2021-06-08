@@ -1,40 +1,28 @@
 import firebase from "firebase/app";
-import { auth, db } from "../lib/firebase";
+import { auth, db, initFirebase } from "../lib/firebase";
+
+initFirebase();
 function SingIn() {
   const provider = new firebase.auth.GoogleAuthProvider();
   //const provider = new auth.GoogleAuthProvider()
 
   const singInWithGoogle = async () => {
-    //TODO handle errors
-    const result = await auth.signInWithPopup(provider);
-    const { uid, email } = result.user;
-    //saving the user to firestore
-    db.collection("users").doc(uid).set({ email }, { merge: true });
+    try {
+      const result = await auth.signInWithPopup(provider);
+      console.log(result.user);
+      const { uid, email } = result.user;
+      //saving the user to firestore
+      db.collection("users").doc(uid).set({ email }, { merge: true });
+    } catch (error) {
+      console.log("An error happened in the sing in process");
+    }
   };
-  // auth
-  // .signInWithPopup(provider)
-  // .then((result) => {
-  //   /** @type {firebase.auth.OAuthCredential} */
-  //   var credential = result.credential;
 
-  //   // This gives you a Google Access Token. You can use it to access the Google API.
-  //   var token = credential.accessToken;
-  //   // The signed-in user info.
-  //   var user = result.user;
-  //   // ...
-  // })
-  // .catch((error) => {
-  //   // Handle Errors here.
-  //   var errorCode = error.code;
-  //   var errorMessage = error.message;
-  //   // The email of the user's account used.
-  //   var email = error.email;
-  //   // The firebase.auth.AuthCredential type that was used.
-  //   var credential = error.credential;
-  //   // ...
-  // });
-
-  return <div></div>;
+  return (
+    <div>
+      <button onClick={singInWithGoogle}>Sing in With Google</button>
+    </div>
+  );
 }
 
 export default SingIn;

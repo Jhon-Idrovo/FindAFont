@@ -1,6 +1,6 @@
 import Checkout from "../components/Checkout";
 import { useEffect, useState } from "react";
-
+import SingIn from "../components/SingIn";
 import axios from "axios";
 
 function Tests() {

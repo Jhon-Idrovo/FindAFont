@@ -12,7 +12,14 @@ export const firebaseConfig = {
   measurementId: process.env.FIREBASE_MEASUREMENT_ID,
 };
 
-firebase.initializeApp(firebaseConfig);
+export default function initFirebase() {
+  // Initialize Firebase
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  console.log("firebase successfully initialized");
+  return firebase;
+}
 
 export const db = firebase.firestore();
 //auth with localized language
