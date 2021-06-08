@@ -31,6 +31,7 @@ export default function Home() {
   const saveFonts = () => {
     //save the current font(s) when "SAVE THIS" is pressed
     setLiked((prev) => [...prev, texts.map((t) => t.fontIndex)]);
+    //send the info to the server
   };
 
   //TEXTS CONFIG
@@ -104,7 +105,7 @@ export default function Home() {
           >
             ...
             <ul
-              className={`absolute top-8 right-0 overflow-hidden transition-all ${
+              className={`absolute top-8 right-0 overflow-hidden transition-all bg-base ${
                 isConfigOpen ? "max-h-screen" : "max-h-0"
               }`}
             >

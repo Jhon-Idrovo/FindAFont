@@ -8,9 +8,9 @@ function Checkout() {
   const [priceId, setPriceId] = useState("price_1Iyx9wHhEOvz8JaOMOYdWrWV");
 
   const handleCheckout = async () => {
-    const { id } = await fetchCheckout(priceId);
+    const { id: sessionId } = await fetchCheckout(priceId);
     console.log(id);
-    const { error } = stripe.redirectToCheckout({ sessionId: id });
+    const { error } = stripe.redirectToCheckout({ sessionId });
     error ? console.log(error) : null;
   };
   return (
@@ -28,3 +28,10 @@ function Checkout() {
 }
 
 export default Checkout;
+
+export function CheckoutSuccess() {
+  //retrieve the session id from stripe
+  const url = window.location.href;
+  const sessionId = new URL(url).searchParams.get("session_id");
+  return;
+}

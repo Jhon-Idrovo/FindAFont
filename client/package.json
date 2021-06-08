@@ -11,10 +11,12 @@
     "@stripe/react-stripe-js": "^1.4.1",
     "@stripe/stripe-js": "^1.15.0",
     "axios": "^0.21.1",
+    "firebase": "^8.6.5",
     "next": "^10.0.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
-    "react-query": "^3.16.1"
+    "react-query": "^3.16.1",
+    "reactfire": "^3.0.0-rc.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.2.6",
