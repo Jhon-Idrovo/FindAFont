@@ -24,4 +24,4 @@ initFirebase();
 
 export const db = firebase.firestore();
 //auth with localized language
-export const auth = firebase.auth().useDeviceLanguage();
+export const auth = firebase.auth();

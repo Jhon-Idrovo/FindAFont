@@ -9,11 +9,11 @@ function SingIn() {
     try {
       const result = await auth.signInWithPopup(provider);
       console.log(result.user);
-      const { uid, email } = result.user;
+      const { uid, email, displayName: name } = result.user;
       //saving the user to firestore
-      db.collection("users").doc(uid).set({ email }, { merge: true });
+      db.collection("users").doc(uid).set({ email, name }, { merge: true });
     } catch (error) {
-      console.log("An error happened in the sing in process");
+      console.log("An error happened in the sing in process", error);
     }
   };
 
