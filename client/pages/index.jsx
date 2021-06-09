@@ -1,6 +1,5 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 import TextShowcase from "../components/TextShowcase";
 import useFonts from "../hooks/useFonts";
@@ -45,6 +44,7 @@ export default function Home() {
     const newCol = e.target.value;
     setConfig((prev) => ({ ...prev, bgCol: newCol }));
   };
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   return (
     <>
@@ -129,6 +129,11 @@ export default function Home() {
               </li>
             </ul>
           </button>
+          <button
+            onClick={() => {
+              setIsFullScreen((prev) => !prev);
+            }}
+          ></button>
         </div>
       </main>
     </>

@@ -7,7 +7,7 @@ import { initFirebase } from "../lib/firebase";
 // import { setUserCookie } from "../../firebase/userCookies";
 // import { mapUserData } from "../../firebase/mapUserData";
 
-initFirebase(); // initialize firebase
+// initialize firebase
 
 const firebaseAuthConfig = {
   signInFlow: "popup",

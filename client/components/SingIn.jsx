@@ -1,7 +1,6 @@
 import firebase from "firebase/app";
-import { auth, db, initFirebase } from "../lib/firebase";
+import { auth, db } from "../lib/firebase";
 
-initFirebase();
 function SingIn() {
   const provider = new firebase.auth.GoogleAuthProvider();
   //const provider = new auth.GoogleAuthProvider()
