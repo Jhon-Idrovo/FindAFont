@@ -3,7 +3,6 @@ import { auth, db } from "../lib/firebase";
 
 function SingIn() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  //const provider = new auth.GoogleAuthProvider()
 
   const singInWithGoogle = async () => {
     try {

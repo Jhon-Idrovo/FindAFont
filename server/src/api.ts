@@ -2,13 +2,15 @@ import express, { Request, Response, NextFunction } from "express";
 export const app = express();
 import cors from "cors";
 import { auth } from "./firebase";
-//import firebase from "firebase/app";
+import { createStripeCheckout } from "./checkout";
 
 app.use(express.json());
 app.use(cors({ origin: true }));
-
-import { createStripeCheckout } from "./checkout";
-
+app.use(decodeJWT);
+/*
+to validate and acces to the user
+const user = validateUser(req)
+*/
 //Checkout
 app.post(
   "/checkout",
@@ -26,6 +28,7 @@ function runAsync(callback: Function) {
 }
 
 async function decodeJWT(req: Request, res: Response, next: NextFunction) {
+  //get the firebae auth token from the request
   if (req.headers?.authorization?.startsWith("Bearer ")) {
     const idToken = req.headers.authorization.split("Bearer ")[1];
     try {
@@ -37,4 +40,13 @@ async function decodeJWT(req: Request, res: Response, next: NextFunction) {
   }
 
   next();
+}
+
+//thrown an error if the user is not logged in
+function validateUser(req: Request) {
+  const user = req["currentUser"];
+  if (!user) {
+    throw new Error("Logged needed");
+  }
+  return user;
 }

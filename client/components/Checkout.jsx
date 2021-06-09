@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fetchCheckout } from "../lib/utils";
+import { fetchCheckout, fetchFromAPI } from "../lib/utils";
 import { useStripe } from "@stripe/react-stripe-js";
 
 function Checkout() {
@@ -8,8 +8,11 @@ function Checkout() {
   const [priceId, setPriceId] = useState("price_1Iyx9wHhEOvz8JaOMOYdWrWV");
 
   const handleCheckout = async () => {
-    const { id: sessionId } = await fetchCheckout(priceId);
-    console.log(id);
+    const { id: sessionId } = await fetchFromAPI("checkout", {
+      body: { priceId },
+    });
+    //const { id: sessionId } = await fetchCheckout(priceId);
+    console.log(sessionId);
     const { error } = stripe.redirectToCheckout({ sessionId });
     error ? console.log(error) : null;
   };
