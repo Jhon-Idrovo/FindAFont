@@ -75,6 +75,7 @@ function Tests() {
       <button onClick={() => handleFontChange(+1)}>Next</button>
       <button onClick={saveFonts}>Save</button>
       <SingIn />
+      <Checkout />
     </div>
   );
 }

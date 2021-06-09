@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fetchCheckout, fetchFromAPI } from "../lib/utils";
+import { fetchFromAPI } from "../lib/utils";
 import { useStripe } from "@stripe/react-stripe-js";
 
 function Checkout() {

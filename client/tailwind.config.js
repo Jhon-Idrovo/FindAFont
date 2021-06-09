@@ -6,8 +6,8 @@ module.exports = {
     colors: {
       base: colors.black,
       "txt-base": colors.gray[100],
-      primary: colors.yellow[100],
-      "txt-primary": colors.black,
+      primary: colors.gray[400],
+      "txt-primary": colors.white,
       secondary: colors.yellow[900],
       "txt-secondary": colors.white,
     },

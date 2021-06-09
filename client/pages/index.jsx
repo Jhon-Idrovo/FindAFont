@@ -30,7 +30,7 @@ export default function Home() {
   const saveFonts = () => {
     //save the current font(s) when "SAVE THIS" is pressed
     setLiked((prev) => [...prev, texts.map((t) => t.fontIndex)]);
-    //send the info to the server
+    //send the info to the server if the user is authenticated
   };
 
   //TEXTS CONFIG
@@ -57,7 +57,7 @@ export default function Home() {
           />
         ))}
       </Head>
-      <main className="fixed top-12 bottom-0 right-0 left-0 text-txt-base bg-base">
+      <main className="fixed top-10 bottom-0 right-0 left-0 text-txt-base bg-base">
         <div className="absolute top-2 w-full flex flex-col items-center">
           <button className="">I HATE THIS</button>
           <select
@@ -88,7 +88,46 @@ export default function Home() {
           SAVE THIS
         </button>
 
-        <div className="flex flex-col absolute top-16 bottom-16 right-20 left-28 border-2 border-txt-base">
+        <div className=" flex flex-col absolute top-16 bottom-16 right-20 left-28 border-2 border-txt-base">
+          <div className="flex justify-end mx-1 my-0">
+            <button
+              onClick={() => setIsConfigOpen((prev) => !prev)}
+              className="mx-1"
+            >
+              <i class="fas fa-ellipsis-h"></i>
+              <ul
+                className={`absolute top-8 right-0 overflow-hidden transition-all bg-base ${
+                  isConfigOpen ? "max-h-screen" : "max-h-0"
+                }`}
+              >
+                <li>
+                  Font Color
+                  <input
+                    value={config.txtCol}
+                    onChange={changeTxtCol}
+                    type="color"
+                    id="font-color-picker"
+                  />
+                </li>
+                <li>
+                  Background Color
+                  <input
+                    value={config.bgCol}
+                    onChange={changeBgCol}
+                    type="color"
+                    id="bg-color-picker"
+                  />
+                </li>
+              </ul>
+            </button>
+            <button
+              onClick={() => {
+                setIsFullScreen((prev) => !prev);
+              }}
+            >
+              <i class="fas fa-expand-arrows-alt"></i>
+            </button>
+          </div>
           {fonts
             ? texts.map((t, index) => (
                 <TextShowcase
@@ -99,41 +138,6 @@ export default function Home() {
                 />
               ))
             : null}
-          <button
-            onClick={() => setIsConfigOpen((prev) => !prev)}
-            className="absolute -top-8 right-0"
-          >
-            ...
-            <ul
-              className={`absolute top-8 right-0 overflow-hidden transition-all bg-base ${
-                isConfigOpen ? "max-h-screen" : "max-h-0"
-              }`}
-            >
-              <li>
-                Font Color
-                <input
-                  value={config.txtCol}
-                  onChange={changeTxtCol}
-                  type="color"
-                  id="font-color-picker"
-                />
-              </li>
-              <li>
-                Background Color
-                <input
-                  value={config.bgCol}
-                  onChange={changeBgCol}
-                  type="color"
-                  id="bg-color-picker"
-                />
-              </li>
-            </ul>
-          </button>
-          <button
-            onClick={() => {
-              setIsFullScreen((prev) => !prev);
-            }}
-          ></button>
         </div>
       </main>
     </>
