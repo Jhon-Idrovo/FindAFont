@@ -13,25 +13,49 @@ export default function Home() {
   ]);
   const [activeTextIndex, setActiveTextIndex] = useState(0);
   const handleFontChange = (change) => {
-    const currentText = texts[activeTextIndex];
-    const nextFont = fonts[currentText.fontIndex + change];
-    //check if the font meets the restrictions
-    if (currentText.filters.includes(nextFont.category))
-      return handleFontChange(change);
-    setTexts((prev) => {
-      prev[activeTextIndex].fontIndex =
-        prev[activeTextIndex].fontIndex + change;
-      return JSON.parse(JSON.stringify(prev));
+    setTexts((texts) => {
+      const currentText = texts[activeTextIndex];
+      const nextFont = fonts[currentText.fontIndex + change];
+      const nextFontIndex = currentText.fontIndex + change;
+      //check for negative index
+      if (nextFontIndex < 0) {
+        return texts;
+      }
+      //check if the font meets the restrictions
+      if (
+        currentText.filters.includes(nextFont.category) ||
+        currentText.filters.includes(nextFontIndex)
+      ) {
+        setTimeout(() => {
+          handleFontChange(change);
+        }, 0);
+        return texts;
+      }
+      texts[activeTextIndex].fontIndex = nextFontIndex;
+      //to force re-rendering
+      return JSON.parse(JSON.stringify(texts));
     });
   };
 
-  //SAVE LIKED FONTS
+  const doNotShowFont = () => {
+    setTexts((texts) => {
+      texts[activeTextIndex].filters = [
+        ...texts[activeTextIndex].filters,
+        texts[activeTextIndex].fontIndex,
+      ];
+      //to force re-rendering
+      return JSON.parse(JSON.stringify(texts));
+    });
+  };
+
+  //SAVE AND SHOW LIKED FONTS
   const [liked, setLiked] = useState([]);
   const saveFonts = () => {
     //save the current font(s) when "SAVE THIS" is pressed
     setLiked((prev) => [...prev, texts.map((t) => t.fontIndex)]);
     //send the info to the server if the user is authenticated
   };
+  const [isShowingLiked, setIsShowingLiked] = useState(false);
 
   //TEXTS CONFIG
   const [isConfigOpen, setIsConfigOpen] = useState(false);
@@ -46,6 +70,24 @@ export default function Home() {
   };
   const [isFullScreen, setIsFullScreen] = useState(false);
 
+  //SETTING UP LISTENERS FOR THE KEYS
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      const { key } = e;
+      console.log(key);
+      key === "ArrowUp" ? doNotShowFont() : null;
+      key === "ArrowDown" ? saveFonts() : null;
+      key === "ArrowLeft" ? handleFontChange(-1) : null;
+      key === "ArrowRight" ? handleFontChange(+1) : null;
+    };
+    //suscribe to the events
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      //unsuscribe to the events
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
   return (
     <>
       <Head>
@@ -59,15 +101,17 @@ export default function Home() {
       </Head>
       <main className="fixed top-10 bottom-0 right-0 left-0 text-txt-base bg-base">
         <div className="absolute top-2 w-full flex flex-col items-center">
-          <button className="">I HATE THIS</button>
-          <select
+          <button onClick={doNotShowFont} className="">
+            I HATE THIS
+          </button>
+          {/* <select
             className="bg-base text-txt-base"
             name="hide-option"
             id="hide-option"
-          >
+            >
             <option value="never">Don't show again</option>
             <option value="last">Show last</option>
-          </select>
+          </select> */}
         </div>
         <button
           onClick={() => handleFontChange(-1)}
@@ -77,18 +121,26 @@ export default function Home() {
         </button>
         <button
           onClick={() => handleFontChange(+1)}
-          className="absolute top-1/2 right-2"
+          className="absolute top-1/2 right-6"
         >
           NEXT
         </button>
         <button
           onClick={saveFonts}
-          className="absolute bottom-2 w-full flex justify-center"
+          className="absolute bottom-10 flex w-full justify-center"
         >
           SAVE THIS
         </button>
-
-        <div className=" flex flex-col absolute top-16 bottom-16 right-20 left-28 border-2 border-txt-base">
+        <button className="absolute bottom-8 w-max right-4 btn py-2 px-4">
+          Next
+        </button>
+        <div
+          className={`flex flex-col absolute  ${
+            isFullScreen
+              ? "top-0 bottom-0 right-0 left-0 z-10"
+              : "top-16 bottom-16 right-24 left-24"
+          } bg-base border-2 border-txt-base`}
+        >
           <div className="flex justify-end mx-1 my-0">
             <button
               onClick={() => setIsConfigOpen((prev) => !prev)}
@@ -125,7 +177,11 @@ export default function Home() {
                 setIsFullScreen((prev) => !prev);
               }}
             >
-              <i class="fas fa-expand-arrows-alt"></i>
+              {isFullScreen ? (
+                <i class="fas fa-compress-arrows-alt"></i>
+              ) : (
+                <i class="fas fa-expand-arrows-alt"></i>
+              )}
             </button>
           </div>
           {fonts
@@ -139,6 +195,9 @@ export default function Home() {
               ))
             : null}
         </div>
+        {isShowingLiked && (
+          <div className="w-screen h-screen bg-base bg-opacity-95"></div>
+        )}
       </main>
     </>
   );

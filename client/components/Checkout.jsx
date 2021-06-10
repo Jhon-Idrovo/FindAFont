@@ -8,11 +8,12 @@ function Checkout() {
   const [priceId, setPriceId] = useState("price_1Iyx9wHhEOvz8JaOMOYdWrWV");
 
   const handleCheckout = async () => {
+    //Get the checkout session id
     const { id: sessionId } = await fetchFromAPI("checkout", {
       body: { priceId },
     });
-    //const { id: sessionId } = await fetchCheckout(priceId);
     console.log(sessionId);
+    //use the session id to make the payment
     const { error } = stripe.redirectToCheckout({ sessionId });
     error ? console.log(error) : null;
   };

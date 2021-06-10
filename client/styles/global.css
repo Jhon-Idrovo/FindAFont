@@ -47,6 +47,9 @@ body {
   @apply rounded-full p-2 hover:bg-primary hover:text-secondary border-secondary border-solid bg-secondary text-txt-secondary;
   border-width: 1px;
 }
+.btn {
+  @apply bg-primary text-txt-primary;
+}
 
 /* LANDING PAGE */
 .sec-1 {
