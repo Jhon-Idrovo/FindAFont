@@ -2,80 +2,17 @@ import Checkout from "../components/Checkout";
 import { useEffect, useState } from "react";
 import SingIn from "../components/SingIn";
 import axios from "axios";
+import { db, auth } from "../lib/firebase";
+import { fetchFromAPI } from "../lib/utils";
+//elements
+import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 function Tests() {
-  //FULL FONTS LIST
-  const [fonts, setFonts] = useState(false);
-  const GoogleFontsAPIKey = "AIzaSyBURN0QbZlqbqoUPbIKdRhcDkH_Xz2taAs";
-  async function fetchFontsList() {
-    const res = await axios.get(
-      `https://www.googleapis.com/webfonts/v1/webfonts?key=${GoogleFontsAPIKey}`
-    );
-    console.log(res);
-    if (res.status === 200) {
-      setFonts(res.data.items);
-    }
-  }
-  useEffect(() => {
-    fetchFontsList();
-  }, []);
-  //------------------------------------
-  const [texts, setTexts] = useState([
-    { fontIndex: 0, filters: [] },
-    { fontIndex: 0, filters: [] },
-  ]);
-  const [activeTextIndex, setActiveTextIndex] = useState(0);
-  const handleFontChange = (change) => {
-    const currentText = texts[activeTextIndex];
-    const nextFont = fonts[currentText.fontIndex + change];
-    //check if the font meets the restrictions
-    if (currentText.filters.includes(nextFont.category))
-      return handleFontChange(change);
-    setTexts((prev) => {
-      prev[activeTextIndex].fontIndex =
-        prev[activeTextIndex].fontIndex + change;
-      return JSON.parse(JSON.stringify(prev));
-    });
-  };
-
-  //SAVE LIKED FONTS
-  const [liked, setLiked] = useState([]);
-  const saveFonts = () => {
-    //save the current font(s) when "SAVE THIS" is pressed
-    setLiked((prev) => [...prev, texts.map((t) => t.fontIndex)]);
-  };
-
-  //SEE SELECTIONS
-
+  const user = auth.currentUser;
   return (
     <div>
-      <div>
-        {fonts
-          ? fonts.map(({ family }) => (
-              <link
-                rel="stylesheet"
-                href={`https://fonts.googleapis.com/css?family=${family}`}
-              />
-            ))
-          : null}
-      </div>
-      <div>
-        {fonts &&
-          texts.map((text, index) => {
-            return (
-              <TextFrame
-                index={index}
-                setActiveTextIndex={setActiveTextIndex}
-                font={fonts[text.fontIndex]}
-                key={index}
-              />
-            );
-          })}
-      </div>
-      <button onClick={() => handleFontChange(+1)}>Next</button>
-      <button onClick={saveFonts}>Save</button>
       <SingIn />
-      <Checkout />
+      <PlanSelection user={user} />
     </div>
   );
 }
@@ -97,5 +34,104 @@ function TextFrame({ font, setActiveTextIndex, index }) {
         rows="10"
       ></textarea>
     </div>
+  );
+}
+
+function userData({ user }) {
+  //USER HANDLING
+  const [userData, setUserData] = useState({});
+
+  useEffect(() => {
+    function unsubscribe() {
+      const userInfo = db
+        .collection("users")
+        .doc(user.uid)
+        .onSnapshot((doc) => setUserData(doc.data()));
+      //what happens when the user does not have this record?
+      const userMembership = db
+        .collection("users")
+        .doc(user.uid)
+        .collection("private")
+        .doc("subscription")
+        .onSnapshot((doc) =>
+          setUserData((prev) => ({ ...prev, ...doc.data() }))
+        );
+      return () => userInfo() && userMembership();
+    }
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+  return (
+    <div>
+      User id: {userData.stripeId}
+      Subscription: {userData.subscriptionType}
+    </div>
+  );
+}
+
+function PlanSelection({ user = null }) {
+  const [priceId, setPriceId] = useState();
+  const [subscription, setSubscription] = useState();
+  //SUBSCRIPTION FORM
+  const createSubscription = async () => {
+    const subscription = await fetchFromAPI("subscription/create", {
+      body: {
+        priceId,
+      },
+    });
+    console.log(subscription);
+    setSubscription(subscription);
+  };
+
+  if (!user) {
+    return <div>Please Login first</div>;
+  }
+  return (
+    <div>
+      <h1>Select an option</h1>
+      <button onClick={() => setPriceId("price_1Iyx9wHhEOvz8JaOSVCF6AJi")}>
+        Mensual
+      </button>
+      <button onClick={() => setPriceId("price_1Iyx9wHhEOvz8JaOMOYdWrWV")}>
+        Anuallyyyy
+      </button>
+      {subscription ? (
+        <CheckoutForm
+          clientSecret={
+            subscription.latest_invoice.payment_intent.client_secret
+          }
+        />
+      ) : (
+        <button onClick={createSubscription}>Create Sub</button>
+      )}
+    </div>
+  );
+}
+
+function CheckoutForm({ clientSecret }) {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const submitPayment = async (e) => {
+    e.preventDefault();
+    if (!elements || !stripe) {
+      //Make sure to disable form submission
+      console.log("Stripe has not loaded yet");
+      return;
+    }
+    //get the card element with the payment information
+    const cardElement = elements.getElement(CardElement);
+    const { error } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: { card: cardElement, billing_details: { name: "test" } },
+    });
+    error ? console.log(error) : console.log("payment done!");
+  };
+  return (
+    <form onSubmit={submitPayment}>
+      <CardElement />
+      <button>Pay</button>
+    </form>
   );
 }
