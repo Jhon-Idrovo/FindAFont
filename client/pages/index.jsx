@@ -59,11 +59,19 @@ export default function Home() {
 
   //TEXTS CONFIG
   const [isConfigOpen, setIsConfigOpen] = useState(false);
-  const [config, setConfig] = useState({ bgCol: "#000000", txtCol: "#FFFFFF" });
+  const [config, setConfig] = useState({ bgCol: "#FFFFFF", txtCol: "#000000" });
   const changeTxtCol = (e) => {
     const newCol = e.target.value;
     setConfig((prev) => ({ ...prev, txtCol: newCol }));
   };
+  const handleConfigSubmit = (e) => {
+    e.preventDefault();
+    console.log(e);
+    const txtCol = e.target[0].value;
+    const bgCol = e.target[1].value;
+    setConfig({ bgCol, txtCol });
+  };
+
   const changeBgCol = (e) => {
     const newCol = e.target.value;
     setConfig((prev) => ({ ...prev, bgCol: newCol }));
@@ -102,7 +110,7 @@ export default function Home() {
       <main className="fixed top-10 bottom-0 right-0 left-0 text-txt-base bg-base">
         <div className="absolute top-2 w-full flex flex-col items-center">
           <button onClick={doNotShowFont} className="">
-            I HATE THIS
+            DONT SHOW ME THIS
           </button>
           {/* <select
             className="bg-base text-txt-base"
@@ -147,31 +155,24 @@ export default function Home() {
               className="mx-1"
             >
               <i class="fas fa-ellipsis-h"></i>
-              <ul
-                className={`absolute top-8 right-0 overflow-hidden transition-all bg-base ${
-                  isConfigOpen ? "max-h-screen" : "max-h-0"
-                }`}
-              >
-                <li>
-                  Font Color
-                  <input
-                    value={config.txtCol}
-                    onChange={changeTxtCol}
-                    type="color"
-                    id="font-color-picker"
-                  />
-                </li>
-                <li>
-                  Background Color
-                  <input
-                    value={config.bgCol}
-                    onChange={changeBgCol}
-                    type="color"
-                    id="bg-color-picker"
-                  />
-                </li>
-              </ul>
             </button>
+            <ul
+              className={`absolute top-8 right-0 overflow-hidden transition-all bg-base ${
+                isConfigOpen ? "max-h-screen" : "max-h-0"
+              }`}
+            >
+              <li>
+                <form onSubmit={handleConfigSubmit}>
+                  <label htmlFor="font-color-picker">Font Color</label>
+
+                  <input type="color" id="font-color-picker" name="txtCol" />
+                  <label htmlFor="bg-color-picker">Background Color</label>
+
+                  <input type="color" id="bg-color-picker" name="bgCol" />
+                  <button>Save</button>
+                </form>
+              </li>
+            </ul>
             <button
               onClick={() => {
                 setIsFullScreen((prev) => !prev);

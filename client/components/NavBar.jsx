@@ -1,20 +1,34 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-
+import { useUser } from "reactfire";
 function NavBar() {
   const router = useRouter();
+  const { data: user } = useUser();
   return (
     <nav className=" p-2 h-10 flex justify-between items-center  bg-primary text-txt-primary">
       <Link href="/">
         <a>Find A Font</a>
       </Link>
       <ul className="flex justify-between items-center">
-        <li className="nav-list-item">Excluded Fonts</li>
-        <li className="nav-list-item">Most Liked</li>
-        <li className="nav-list-item">Collections</li>
-        <li className="nav-list-item">Buy me a sandwich</li>
         <li className="nav-list-item">
-          <div>U</div>
+          <Link href="/exlcusion-list">
+            <a>Exclusion List</a>
+          </Link>
+        </li>
+        <li className="nav-list-item">
+          <Link href="/collections">
+            <a>Saved Collections</a>
+          </Link>
+        </li>
+        <li className="nav-list-item">
+          <Link href="/most-liked">
+            <a>Most Liked</a>
+          </Link>
+        </li>
+        {/* <li className="nav-list-item"><Link href="/trending"><a>Trending</a></Link></li> */}
+
+        <li className="nav-list-item">
+          {user ? <div>{user.displayName.charAt(0)}</div> : null}
         </li>
       </ul>
     </nav>

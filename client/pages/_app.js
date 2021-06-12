@@ -3,11 +3,15 @@ import Head from "next/head";
 //locals
 import "../styles/global.css";
 import NavBar from "../components/NavBar";
+import { firebaseConfig } from "../lib/firebase";
 //stripe
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 //react query
 import { QueryClient, QueryClientProvider } from "react-query";
+//react-fire
+import "firebase/firestore";
+import { FirebaseAppProvider } from "reactfire";
 
 export const stripePromise = loadStripe(
   "pk_test_51Iyx5dHhEOvz8JaOeTtCEBXMSff06WroQUgQ3ipHwrJpERmx1uPd2S50weOJFRo6JRxxpbrUXvViNMudhE0hR9S700hzAOsrqs"
@@ -35,12 +39,14 @@ export default function App({ Component, pageProps }) {
           referrerPolicy="no-referrer"
         />
       </Head>
-      <QueryClientProvider client={queryClient}>
-        <Elements stripe={stripePromise}>
-          <NavBar />
-          <Component {...pageProps} />
-        </Elements>
-      </QueryClientProvider>
+      <FirebaseAppProvider firebaseConfig={firebaseConfig}>
+        <QueryClientProvider client={queryClient}>
+          <Elements stripe={stripePromise}>
+            <NavBar />
+            <Component {...pageProps} />
+          </Elements>
+        </QueryClientProvider>
+      </FirebaseAppProvider>
     </>
   );
 }

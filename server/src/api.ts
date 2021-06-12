@@ -142,7 +142,7 @@ app.post(
           .doc(uid)
           .collection("private")
           .doc("subscription")
-          .set({ subscriptionType: "PRO", subscriptionId: subscription_id });
+          .set({ subscriptionType: "PRO", subscriptionId: "dummie" });
         return res.send({ received: true });
 
       case "invoice.paid":
