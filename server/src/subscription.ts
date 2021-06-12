@@ -97,6 +97,7 @@ export async function createSubscriptionV2(
   );
 
   //Update the user's memberhsip on success
+  //redundant with webhooks?
   if (paymentIntent.status === "succeeded") {
     console.log(
       "------------------------------------------------------------------------------------success"
@@ -113,4 +114,5 @@ export async function createSubscriptionV2(
       .doc("subscription")
       .set({ subscriptionType: "PRO" }, { merge: true });
   }
+  return subscription;
 }

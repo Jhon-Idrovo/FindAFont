@@ -12,82 +12,61 @@ function Tests() {
   return (
     <div>
       <SingIn />
-      <PlanSelection user={user} />
+      <PlanSelectionV2 user={user} />
     </div>
   );
 }
 
 export default Tests;
 
-function TextFrame({ font, setActiveTextIndex, index }) {
-  console.log(font);
-
-  //variants and textarea
-  return (
-    <div>
-      <textarea
-        onClick={() => setActiveTextIndex(index)}
-        style={{
-          fontFamily: `${font.family},serif`,
-        }}
-        cols="30"
-        rows="10"
-      ></textarea>
-    </div>
-  );
-}
-
-function userData({ user }) {
-  //USER HANDLING
-  const [userData, setUserData] = useState({});
-
-  useEffect(() => {
-    function unsubscribe() {
-      const userInfo = db
-        .collection("users")
-        .doc(user.uid)
-        .onSnapshot((doc) => setUserData(doc.data()));
-      //what happens when the user does not have this record?
-      const userMembership = db
-        .collection("users")
-        .doc(user.uid)
-        .collection("private")
-        .doc("subscription")
-        .onSnapshot((doc) =>
-          setUserData((prev) => ({ ...prev, ...doc.data() }))
-        );
-      return () => userInfo() && userMembership();
-    }
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-  return (
-    <div>
-      User id: {userData.stripeId}
-      Subscription: {userData.subscriptionType}
-    </div>
-  );
-}
-
-function PlanSelection({ user = null }) {
+function PlanSelectionV2({ user }) {
+  //const user = useUser()
   const [priceId, setPriceId] = useState();
-  const [subscription, setSubscription] = useState();
-  //SUBSCRIPTION FORM
-  const createSubscription = async () => {
-    const subscription = await fetchFromAPI("subscription/create", {
-      body: {
-        priceId,
-      },
+  const elemets = useElements();
+  const stripe = useStripe();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const card = elemets.getElement(CardElement);
+    const { paymentMethod, error } = await stripe.createPaymentMethod({
+      type: "card",
+      card,
     });
-    console.log(subscription);
-    setSubscription(subscription);
+    if (error) {
+      console.log(error);
+      return;
+    } else {
+      const { latest_invoice } = await fetchFromAPI("subscription/create", {
+        body: { priceId, paymentMethod: paymentMethod.id },
+      });
+
+      //the subscription contains the invoice with the payment intent that tells if the payment has been made
+      //if the invoice's payment succeeded then we don't need to do anything
+      //otherwise, confirmation is needed
+      if (latest_invoice.payment_intent) {
+        const { client_secret, status } = latest_invoice.payment_intent;
+        //if 3d verification is needed
+        if (
+          status === "requires_action" ||
+          status === "requires_confirmation"
+        ) {
+          const { error: confirmationError } = await stripe.confirmCardPayment(
+            client_secret
+          );
+          if (confirmationError) {
+            console.log(
+              "An error happened trying to confirm the card payment:",
+              confirmationError
+            );
+          } else {
+            //success
+            alert("You are subscribed");
+          }
+        }
+      }
+    }
   };
 
-  if (!user) {
-    return <div>Please Login first</div>;
-  }
   return (
     <div>
       <h1>Select an option</h1>
@@ -95,43 +74,111 @@ function PlanSelection({ user = null }) {
         Mensual
       </button>
       <button onClick={() => setPriceId("price_1Iyx9wHhEOvz8JaOMOYdWrWV")}>
-        Anuallyyyy
+        Anually
       </button>
-      {subscription ? (
-        <CheckoutForm
-          clientSecret={
-            subscription.latest_invoice.payment_intent.client_secret
-          }
-        />
-      ) : (
-        <button onClick={createSubscription}>Create Sub</button>
-      )}
+      <form onSubmit={handleSubmit}>
+        <CardElement />
+        <button>Pay</button>
+      </form>
     </div>
   );
 }
 
-function CheckoutForm({ clientSecret }) {
-  const stripe = useStripe();
-  const elements = useElements();
+// function userData({ user }) {
+//   //USER HANDLING
+//   const [userData, setUserData] = useState({});
 
-  const submitPayment = async (e) => {
-    e.preventDefault();
-    if (!elements || !stripe) {
-      //Make sure to disable form submission
-      console.log("Stripe has not loaded yet");
-      return;
-    }
-    //get the card element with the payment information
-    const cardElement = elements.getElement(CardElement);
-    const { error } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: { card: cardElement, billing_details: { name: "test" } },
-    });
-    error ? console.log(error) : console.log("payment done!");
-  };
-  return (
-    <form onSubmit={submitPayment}>
-      <CardElement />
-      <button>Pay</button>
-    </form>
-  );
-}
+//   useEffect(() => {
+//     function unsubscribe() {
+//       const userInfo = db
+//         .collection("users")
+//         .doc(user.uid)
+//         .onSnapshot((doc) => setUserData(doc.data()));
+//       //what happens when the user does not have this record?
+//       const userMembership = db
+//         .collection("users")
+//         .doc(user.uid)
+//         .collection("private")
+//         .doc("subscription")
+//         .onSnapshot((doc) =>
+//           setUserData((prev) => ({ ...prev, ...doc.data() }))
+//         );
+//       return () => userInfo() && userMembership();
+//     }
+
+//     return () => {
+//       unsubscribe();
+//     };
+//   }, []);
+//   return (
+//     <div>
+//       User id: {userData.stripeId}
+//       Subscription: {userData.subscriptionType}
+//     </div>
+//   );
+// }
+
+// function PlanSelection({ user = null }) {
+//   const [priceId, setPriceId] = useState();
+//   const [subscription, setSubscription] = useState();
+//   //SUBSCRIPTION FORM
+//   const createSubscription = async () => {
+//     const subscription = await fetchFromAPI("subscription/create", {
+//       body: {
+//         priceId,
+//       },
+//     });
+//     console.log(subscription);
+//     setSubscription(subscription);
+//   };
+
+//   if (!user) {
+//     return <div>Please Login first</div>;
+//   }
+//   return (
+//     <div>
+//       <h1>Select an option</h1>
+//       <button onClick={() => setPriceId("price_1Iyx9wHhEOvz8JaOSVCF6AJi")}>
+//         Mensual
+//       </button>
+//       <button onClick={() => setPriceId("price_1Iyx9wHhEOvz8JaOMOYdWrWV")}>
+//         Anually
+//       </button>
+//       {subscription ? (
+//         <CheckoutForm
+//           clientSecret={
+//             subscription.latest_invoice.payment_intent.client_secret
+//           }
+//         />
+//       ) : (
+//         <button onClick={createSubscription}>Create Sub</button>
+//       )}
+//     </div>
+//   );
+// }
+
+// function CheckoutForm({ clientSecret }) {
+//   const stripe = useStripe();
+//   const elements = useElements();
+
+//   const submitPayment = async (e) => {
+//     e.preventDefault();
+//     if (!elements || !stripe) {
+//       //Make sure to disable form submission
+//       console.log("Stripe has not loaded yet");
+//       return;
+//     }
+//     //get the card element with the payment information
+//     const cardElement = elements.getElement(CardElement);
+//     const { error } = await stripe.confirmCardPayment(clientSecret, {
+//       payment_method: { card: cardElement, billing_details: { name: "test" } },
+//     });
+//     error ? console.log(error) : console.log("payment done!");
+//   };
+//   return (
+//     <form onSubmit={submitPayment}>
+//       <CardElement />
+//       <button>Pay</button>
+//     </form>
+//   );
+// }

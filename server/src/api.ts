@@ -5,6 +5,7 @@ import cors from "cors";
 import { auth, db } from "./firebase";
 import {
   createSubscription,
+  createSubscriptionV2,
   cancelSubscription,
   listUserSubscriptions,
 } from "./subscription";
@@ -27,8 +28,17 @@ app.post(
   "/subscription/create",
   runAsync(async (req: Request, res: Response) => {
     const user = validateUser(req);
-    const { priceId } = req.body;
-    const subscription = await createSubscription(user.uid, priceId);
+    console.log(
+      "-------------------------------------------REQ BODY---------------------------------------------",
+      req.body
+    );
+
+    const { priceId, paymentMethod } = req.body;
+    const subscription = await createSubscriptionV2(
+      user.uid,
+      priceId,
+      paymentMethod
+    );
     res.send(subscription);
   })
 );
@@ -103,19 +113,29 @@ app.post(
     const uid = customer.metadata.uid;
 
     switch (eventType) {
-      case "charge.succeeded":
-        // Payment is successful and the subscription is created.
-        //set the firebase user's membership to PRO
-        console.log("PROVISON THE SUBSCRIPTION");
-        //update the payment method
-        const subscription_id = data.subscription;
-        const paymentMethod = data.payment_method;
-        await stripe.subscriptions.update(subscription_id, {
-          default_payment_method: paymentMethod,
-        });
+      // case "charge.succeeded":
+      //   console.log("--------CHARGE SUCCEEDED------");
+      //   // Payment is successful and the subscription is created.
+      //   //set the firebase user's membership to PRO
 
-        // const payment_intent_id = data.payment_intent;
-        // const paymentIntent = stripe.paymentIntents.retrieve(payment_intent_id);
+      //   //update the payment method
+      //   const subscription_id = data.subscription;
+      //   // const paymentMethod = data.payment_method;
+      //   // await stripe.subscriptions.update(subscription_id, {
+      //   //   default_payment_method: paymentMethod,
+      //   // });
+
+      //   //update the database
+      //   await db
+      //     .collection("users")
+      //     .doc(uid)
+      //     .collection("private")
+      //     .doc("subscription")
+      //     .set({ subscriptionType: "PRO", subscriptionId: subscription_id });
+
+      // return res.send({ received: true });
+      case "invoice.payment_succeeded":
+        console.log("--------PAYMENT SUCCEEDED------");
         //update the database
         await db
           .collection("users")
@@ -123,7 +143,6 @@ app.post(
           .collection("private")
           .doc("subscription")
           .set({ subscriptionType: "PRO", subscriptionId: subscription_id });
-
         return res.send({ received: true });
 
       case "invoice.paid":
@@ -131,7 +150,9 @@ app.post(
         // Store the status in your database and check when a user accesses your service.
         // This approach helps you avoid hitting rate limits.
         return res.send({ received: true });
+
       case "invoice.payment_failed":
+        console.log("--------PAYMENT FAILED------");
         // The payment failed or the customer does not have a valid payment method.
         // The subscription becomes past_due. Notify your customer and send them to the
         // customer portal to update their payment information.
