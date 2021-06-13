@@ -7,7 +7,7 @@ import LikedFonts from "../components/LikedFonts";
 import useFonts from "../hooks/useFonts";
 
 import { db } from "../lib/firebase";
-import { useUser } from "reactfire";
+import useUser from "../hooks/useUser";
 
 export default function Home() {
   const { fonts, isLoadingFonts, error } = useFonts();
@@ -60,11 +60,11 @@ export default function Home() {
     setLiked((prev) => [...prev, texts.map((t) => fonts[t.fontIndex].family)]);
   };
   const [isShowingLiked, setIsShowingLiked] = useState(false);
-  const { data: user, error: getUserError } = useUser();
+  const { user, logOut } = useUser();
   const handleShowLiked = async () => {
     setIsShowingLiked(true);
     try {
-      const likedFontsCollection = await db
+      const likedFontsCollection = db
         .collection("users")
         .doc(user.uid)
         .collection("likedFonts");

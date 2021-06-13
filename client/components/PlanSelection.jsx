@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { fetchFromAPI } from "../lib/utils";
+import { UserContext } from "../lib/UserContext";
 //elements
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 //reactfire
 import { useUser } from "reactfire";
 
 export default function PlanSelection() {
-  const { data: user, error } = useUser();
+  const { user } = useContext(UserContext);
   const [priceId, setPriceId] = useState();
   const elemets = useElements();
   const stripe = useStripe();

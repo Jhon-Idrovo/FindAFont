@@ -1,17 +1,18 @@
+import { useState, useMemo, useEffect } from "react";
 //Nextjs
 import Head from "next/head";
 //locals
 import "../styles/global.css";
 import NavBar from "../components/NavBar";
-import { firebaseConfig } from "../lib/firebase";
+import { auth, saveUserToFirestore } from "../lib/firebase";
 //stripe
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 //react query
 import { QueryClient, QueryClientProvider } from "react-query";
-//react-fire
-import "firebase/firestore";
-import { FirebaseAppProvider } from "reactfire";
+
+//context
+import { UserContext } from "../lib/UserContext";
 
 export const stripePromise = loadStripe(
   "pk_test_51Iyx5dHhEOvz8JaOeTtCEBXMSff06WroQUgQ3ipHwrJpERmx1uPd2S50weOJFRo6JRxxpbrUXvViNMudhE0hR9S700hzAOsrqs"
@@ -19,7 +20,29 @@ export const stripePromise = loadStripe(
 
 // Create a react-query client
 const queryClient = new QueryClient();
+/**
+ *
+ *
+ *
+ */
 export default function App({ Component, pageProps }) {
+  const [user, setUser] = useState(null);
+  //memoize the value for performance
+  const value = useMemo(() => ({ user, setUser }), [user, setUser]);
+  //listen for auth changes and set new data in customer
+  useEffect(() => {
+    const cancelListeningUser = auth.onAuthStateChanged((user) => {
+      if (user) {
+        saveUserToFirestore(user);
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+    return () => {
+      cancelListeningUser();
+    };
+  }, []);
   return (
     <>
       <Head>
@@ -39,14 +62,15 @@ export default function App({ Component, pageProps }) {
           referrerPolicy="no-referrer"
         />
       </Head>
-      <FirebaseAppProvider firebaseConfig={firebaseConfig}>
-        <QueryClientProvider client={queryClient}>
-          <Elements stripe={stripePromise}>
+
+      <QueryClientProvider client={queryClient}>
+        <Elements stripe={stripePromise}>
+          <UserContext.Provider value={value}>
             <NavBar />
             <Component {...pageProps} />
-          </Elements>
-        </QueryClientProvider>
-      </FirebaseAppProvider>
+          </UserContext.Provider>
+        </Elements>
+      </QueryClientProvider>
     </>
   );
 }
