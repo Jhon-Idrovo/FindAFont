@@ -1,7 +1,7 @@
 import { UserContext } from "../lib/UserContext";
 import { useContext } from "react";
-import { setUserCookie } from "../lib/firebaseCookies";
-import { auth } from "../lib/firebase";
+import { setUserCookie } from "../lib/firebaseUser";
+import { auth, db } from "../lib/firebase";
 import { useRouter } from "next/router";
 
 function useUser() {
@@ -19,7 +19,13 @@ function useUser() {
         console.error(e);
       });
   };
-
+  if (user) {
+    db.collection("users")
+      .doc(user.uid)
+      .collection("private")
+      .doc("subscription")
+      .get();
+  }
   return { user, setUser, logOut };
 }
 

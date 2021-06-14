@@ -4,7 +4,9 @@ import Head from "next/head";
 //locals
 import "../styles/global.css";
 import NavBar from "../components/NavBar";
-import { auth, saveUserToFirestore } from "../lib/firebase";
+import { auth, db } from "../lib/firebase";
+import { parseUser, saveUserToFirestore } from "../lib/firebaseUser";
+
 //stripe
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -30,11 +32,12 @@ export default function App({ Component, pageProps }) {
   //memoize the value for performance
   const value = useMemo(() => ({ user, setUser }), [user, setUser]);
   //listen for auth changes and set new data in customer
+
   useEffect(() => {
     const cancelListeningUser = auth.onAuthStateChanged((user) => {
       if (user) {
-        saveUserToFirestore(user);
-        setUser(user);
+        //parse the user with the data from the subscription
+        const parsedUser = parseUser(user).then((user) => setUser(user));
       } else {
         setUser(null);
       }

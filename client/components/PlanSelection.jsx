@@ -1,17 +1,16 @@
 import { useState, useContext } from "react";
 import { fetchFromAPI } from "../lib/utils";
-import { UserContext } from "../lib/UserContext";
+
 //elements
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-//reactfire
-import { useUser } from "reactfire";
+import useUser from "../hooks/useUser";
 
 export default function PlanSelection() {
-  const { user } = useContext(UserContext);
+  const { user } = useUser();
   const [priceId, setPriceId] = useState();
   const elemets = useElements();
   const stripe = useStripe();
-  user ? console.log(user) : null;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const card = elemets.getElement(CardElement);

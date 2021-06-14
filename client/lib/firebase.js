@@ -25,12 +25,3 @@ initFirebase();
 export const db = firebase.firestore();
 //auth with localized language
 export const auth = firebase.auth();
-
-export async function saveUserToFirestore(user) {
-  try {
-    const { uid, email, displayName: name } = user;
-    await db.collection("users").doc(uid).set({ email, name }, { merge: true });
-  } catch (e) {
-    console.log("An error happened while saving the user to Firestore", e);
-  }
-}

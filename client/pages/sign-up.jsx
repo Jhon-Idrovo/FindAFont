@@ -1,10 +1,11 @@
-import SingIn from "../components/SingIn";
+import FirebaseAuth from "../components/FirebaseAuth";
 import PlanSelection from "../components/PlanSelection";
 
 function SignUp() {
   return (
     <div>
-      <SingIn />
+      <p>Sign In with you prefered account</p>
+      <FirebaseAuth />
       <PlanSelection />
     </div>
   );

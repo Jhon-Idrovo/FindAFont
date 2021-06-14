@@ -41,6 +41,12 @@ body {
 .nav-list-item {
   @apply px-2 cursor-pointer border-txt-primary border-b-2 border-opacity-0 hover:border-opacity-100;
 }
+.user-icon-menu {
+  display: none;
+}
+#user-icon:hover > .user-icon-menu {
+  display: initial;
+}
 
 /* UTILS */
 .btn-base {
