@@ -13,8 +13,8 @@ function Collections() {
 
   return (
     <div>
-      {user.subscriptionType ? user.subscriptionType : <SubscriptionNeeded />}
-      lkjlkjlkjlkjljk{user?.uid}
+      {user?.subscriptionType ? user.subscriptionType : <SubscriptionNeeded />}
+      {user?.uid}
       <button onClick={logOut}>Logout</button>
     </div>
   );

@@ -1,16 +1,34 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
-import TextShowcase from "../components/TextShowcase";
+import TextArea from "../components/TextArea";
 import LikedFonts from "../components/LikedFonts";
-
+import Loading from "../components/Loading";
 import useFonts from "../hooks/useFonts";
 
+import axios from "axios";
 import { db } from "../lib/firebase";
 import useUser from "../hooks/useUser";
+import { useQuery } from "react-query";
 
 export default function Home() {
-  const { fonts, isLoadingFonts, error } = useFonts();
+  //fetch fonts
+  const GoogleFontsAPIKey = "AIzaSyBURN0QbZlqbqoUPbIKdRhcDkH_Xz2taAs";
+  async function fetchFontsList() {
+    const res = await axios.get(
+      `https://www.googleapis.com/webfonts/v1/webfonts?key=${GoogleFontsAPIKey}`
+    );
+    if (res.status === 200) {
+      return res.data.items;
+    } else {
+      throw Error("Something went wring while fetching the fonts");
+    }
+  }
+  const {
+    data: fonts,
+    error,
+    isLoading: isLoadingFonts,
+  } = useQuery("fonts", fetchFontsList);
   //------------------------------------
   const [texts, setTexts] = useState([
     { fontIndex: 0, filters: [] },
@@ -48,9 +66,12 @@ export default function Home() {
         ...texts[activeTextIndex].filters,
         texts[activeTextIndex].fontIndex,
       ];
+
       //to force re-rendering
       return JSON.parse(JSON.stringify(texts));
     });
+    //advance to the next font
+    handleFontChange(+1);
   };
 
   //SAVE AND SHOW LIKED FONTS
@@ -99,7 +120,6 @@ export default function Home() {
   useEffect(() => {
     const handleKeyPress = (e) => {
       const { key } = e;
-      console.log(key);
       key === "ArrowUp" ? doNotShowFont() : null;
       key === "ArrowDown" ? saveFonts() : null;
       key === "ArrowLeft" ? handleFontChange(-1) : null;
@@ -126,12 +146,12 @@ export default function Home() {
         ))}
       </Head>
       {isShowingLiked ? (
-        <LikedFonts fonts={liked} />
+        <LikedFonts fonts={liked} goBack={() => setIsShowingLiked(false)} />
       ) : (
         <main className="fixed top-10 bottom-0 right-0 left-0 text-txt-base bg-base">
-          <div className="absolute top-2 w-full flex flex-col items-center">
+          <div className="absolute top-6 w-full flex flex-col items-center">
             <button onClick={doNotShowFont} className="">
-              DONT SHOW ME THIS
+              DON'T SHOW AGAIN
             </button>
             {/* <select
             className="bg-base text-txt-base"
@@ -156,9 +176,9 @@ export default function Home() {
           </button>
           <button
             onClick={saveFonts}
-            className="absolute bottom-10 flex w-full justify-center"
+            className="absolute bottom-8 flex w-full justify-center"
           >
-            SAVE THIS
+            SAVE
           </button>
           <button
             onClick={handleShowLiked}
@@ -181,19 +201,22 @@ export default function Home() {
                 <i class="fas fa-ellipsis-h"></i>
               </button>
               <ul
-                className={`absolute top-8 right-0 overflow-hidden transition-all bg-base ${
+                className={`absolute top-6 right-0 overflow-hidden transition-all bg-base ${
                   isConfigOpen ? "max-h-screen" : "max-h-0"
                 }`}
               >
                 <li>
-                  <form onSubmit={handleConfigSubmit}>
+                  <form
+                    onSubmit={handleConfigSubmit}
+                    className="flex flex-col p-2"
+                  >
                     <label htmlFor="font-color-picker">Font Color</label>
 
                     <input type="color" id="font-color-picker" name="txtCol" />
                     <label htmlFor="bg-color-picker">Background Color</label>
 
                     <input type="color" id="bg-color-picker" name="bgCol" />
-                    <button>Save</button>
+                    <button className="btn px-2 mt-2">Save</button>
                   </form>
                 </li>
               </ul>
@@ -209,20 +232,22 @@ export default function Home() {
                 )}
               </button>
             </div>
-            {fonts
-              ? texts.map((t, index) => (
-                  <TextShowcase
-                    config={config}
-                    index={index}
-                    font={fonts[t.fontIndex]}
-                    setActive={setActiveTextIndex}
-                  />
-                ))
-              : null}
+            {!isLoadingFonts ? (
+              texts.map((t, index) => (
+                <TextArea
+                  key={index}
+                  config={config}
+                  index={index}
+                  font={fonts[t.fontIndex]}
+                  setActive={setActiveTextIndex}
+                />
+              ))
+            ) : (
+              <Loading>
+                <p>Loading fonts</p>
+              </Loading>
+            )}
           </div>
-          {isShowingLiked && (
-            <div className="w-screen h-screen bg-base bg-opacity-95"></div>
-          )}
         </main>
       )}
     </>

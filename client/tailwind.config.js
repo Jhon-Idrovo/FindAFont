@@ -4,8 +4,8 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     colors: {
-      base: "#434A42",
-      "txt-base": "#FF6542",
+      base: colors.black,
+      "txt-base": colors.white,
       primary: "#FF6542",
       "txt-primary": colors.white,
       secondary: colors.yellow[900],
