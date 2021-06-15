@@ -117,14 +117,14 @@ export default function Home() {
   const [isFullScreen, setIsFullScreen] = useState(false);
 
   //SETTING UP LISTENERS FOR THE KEYS
+  const handleKeyPress = (e) => {
+    const { key } = e;
+    key === "ArrowUp" ? doNotShowFont() : null;
+    key === "ArrowDown" ? saveFonts() : null;
+    key === "ArrowLeft" ? handleFontChange(-1) : null;
+    key === "ArrowRight" ? handleFontChange(+1) : null;
+  };
   useEffect(() => {
-    const handleKeyPress = (e) => {
-      const { key } = e;
-      key === "ArrowUp" ? doNotShowFont() : null;
-      key === "ArrowDown" ? saveFonts() : null;
-      key === "ArrowLeft" ? handleFontChange(-1) : null;
-      key === "ArrowRight" ? handleFontChange(+1) : null;
-    };
     //suscribe to the events
     document.addEventListener("keydown", handleKeyPress);
 
@@ -132,7 +132,7 @@ export default function Home() {
       //unsuscribe to the events
       document.removeEventListener("keydown", handleKeyPress);
     };
-  }, []);
+  }, [activeTextIndex]);
 
   return (
     <>
@@ -226,9 +226,9 @@ export default function Home() {
                 }}
               >
                 {isFullScreen ? (
-                  <i class="fas fa-compress-arrows-alt"></i>
+                  <i className="fas fa-compress-arrows-alt"></i>
                 ) : (
-                  <i class="fas fa-expand-arrows-alt"></i>
+                  <i className="fas fa-expand-arrows-alt"></i>
                 )}
               </button>
             </div>
