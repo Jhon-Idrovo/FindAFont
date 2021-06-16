@@ -20,24 +20,40 @@ function NavBar() {
         <a>Find A Font</a>
       </Link>
       <ul className="flex justify-between items-center">
-        <li className="nav-list-item">
+        <li
+          className={`nav-list-item ${
+            router.pathname === "/" ? "nav-item-active" : null
+          }`}
+        >
           <Link href="/">
             <a>Test Fonts</a>
           </Link>
         </li>
         {user != "guest" && user != null ? (
           <>
-            <li className="nav-list-item">
+            <li
+              className={`nav-list-item ${
+                router.pathname === "/exclusion-list" ? "nav-item-active" : null
+              }`}
+            >
               <Link href="/exlcusion-list">
                 <a>Exclusion List</a>
               </Link>
             </li>
-            <li className="nav-list-item">
+            <li
+              className={`nav-list-item ${
+                router.pathname === "/collections" ? "nav-item-active" : null
+              }`}
+            >
               <Link href="/collections">
                 <a>Saved Collections</a>
               </Link>
             </li>
-            <li className="nav-list-item">
+            <li
+              className={`nav-list-item ${
+                router.pathname === "/most-liked" ? "nav-item-active" : null
+              }`}
+            >
               <Link href="/most-liked">
                 <a>Most Liked</a>
               </Link>

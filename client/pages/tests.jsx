@@ -4,15 +4,18 @@ import SingIn from "../components/SingIn";
 import axios from "axios";
 import { db, auth } from "../lib/firebase";
 import { fetchFromAPI } from "../lib/utils";
+import Loading from "../components/Loading";
+
 //elements
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 function Tests() {
   const user = auth.currentUser;
   return (
-    <div>
-      <SingIn />
-      <PlanSelectionV2 user={user} />
+    <div className="h-screen">
+      <Loading>
+        <p className="text-txt-base">Testing</p>
+      </Loading>
     </div>
   );
 }

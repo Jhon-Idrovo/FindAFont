@@ -1,11 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;500;600;700&display=swap");
 
 body {
-  font-family: "Manrope", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-    Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: "Saira Condensed", -apple-system, BlinkMacSystemFont, Segoe UI,
+    Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+    sans-serif;
   line-height: 1.5;
   font-size: 16px;
   @apply bg-base;
@@ -39,7 +40,7 @@ body {
 
 /* NAV BAR */
 .nav-list-item {
-  @apply px-2 cursor-pointer border-txt-primary border-b-2 border-opacity-0 hover:border-opacity-100;
+  @apply px-2 cursor-pointer border-primary border-b-2 border-opacity-0 hover:border-opacity-100;
 }
 .user-icon-menu {
   display: none;
@@ -47,16 +48,42 @@ body {
 #user-icon:hover > .user-icon-menu {
   display: initial;
 }
-
+.nav-item-active {
+  @apply border-primary border-b-2;
+}
+/* LOADING VIEW*/
+.loading-container {
+  @apply h-full w-full flex flex-col items-center justify-center;
+}
+.loading-container > div {
+  @apply w-10 h-10 border-2 border-primary rounded-full;
+  border-left-color: transparent;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 /* UTILS */
 .btn-base {
   @apply rounded-full p-2 hover:bg-primary hover:text-secondary border-secondary border-solid bg-secondary text-txt-secondary;
   border-width: 1px;
 }
 .btn {
-  @apply bg-primary text-txt-primary;
+  @apply bg-primary text-txt-primary rounded-md hover:skew-x-2;
 }
-
+.keyboard-icon {
+  @apply w-8 h-8 text-txt-base fill-current mx-2;
+}
+.key-btn-col {
+  @apply flex flex-col justify-center items-center;
+}
+.key-btn-row {
+}
 /* LANDING PAGE */
 .sec-1 {
   background-image: url("https://assets.website-files.com/5faabe4b6f6b4331a5f27952/603fa29994675e4e5487a831_Hero_Original-min-p-500.png");
