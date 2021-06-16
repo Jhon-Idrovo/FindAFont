@@ -19,7 +19,9 @@ function useUser() {
         console.error(e);
       });
   };
-  return { user, setUser, logOut };
+  //if the user has not been loaded yet
+  const isLoadingUser = user===null
+  return { user, setUser, logOut, isLoadingUser };
 }
 
 export default useUser;

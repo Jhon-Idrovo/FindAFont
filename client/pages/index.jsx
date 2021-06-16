@@ -62,7 +62,7 @@ export default function Home() {
     });
   };
   //BLACKLIST FONTS
-  const { user, logOut } = useUser();
+  const { user, logOut, isLoadingUser } = useUser();
   const doNotShowFont = () => {
     setTexts((texts) => {
       texts[activeTextIndex].filters = [
@@ -138,7 +138,13 @@ export default function Home() {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [activeTextIndex]);
-
+  if (isLoadingUser) {
+    return (
+      <Loading>
+        <p className="text-txt-base">Loading data</p>
+      </Loading>
+    );
+  }
   return (
     <>
       <Head>

@@ -10,7 +10,10 @@ function NavBar() {
   const [isShowingSignIn, setIsShowingSignIn] = useState(false);
   const [isShowingLogOut, setIsShowingLogOut] = useState(false);
 
-  const { user, logOut } = useUser();
+  const { user, logOut, isLoadingUser } = useUser();
+  if (isLoadingUser) {
+    return <div></div>;
+  }
   return (
     <nav className=" p-2 h-10 flex justify-between items-center  bg-base text-txt-base">
       <Link href="/">
@@ -22,7 +25,7 @@ function NavBar() {
             <a>Test Fonts</a>
           </Link>
         </li>
-        {user ? (
+        {user != "guest" && user != null ? (
           <>
             <li className="nav-list-item">
               <Link href="/exlcusion-list">

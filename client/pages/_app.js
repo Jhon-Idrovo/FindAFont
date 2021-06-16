@@ -39,7 +39,7 @@ export default function App({ Component, pageProps }) {
         //parse the user with the data from the subscription
         const parsedUser = parseUser(user).then((user) => setUser(user));
       } else {
-        setUser(null);
+        setUser("guest");
       }
     });
     return () => {
