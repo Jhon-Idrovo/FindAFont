@@ -10,7 +10,17 @@ export default function PlanSelection() {
   const [priceId, setPriceId] = useState();
   const elemets = useElements();
   const stripe = useStripe();
-
+  const cardOptions = {
+    style: {
+      base: {
+        color: "white",
+        "::placeholder": {
+          color: "white",
+        },
+        border: "2px white solid",
+      },
+    },
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const card = elemets.getElement(CardElement);
@@ -55,17 +65,60 @@ export default function PlanSelection() {
 
   return (
     <div>
-      <h1>Select a subscription plan</h1>
-      <button onClick={() => setPriceId("price_1Iyx9wHhEOvz8JaOSVCF6AJi")}>
-        Mensual
-      </button>
-      <button onClick={() => setPriceId("price_1Iyx9wHhEOvz8JaOMOYdWrWV")}>
-        Anually
-      </button>
-      <form onSubmit={handleSubmit}>
-        <CardElement />
-        <button disabled={!user ? true : false}>Pay</button>
-        {!user ? <p>Please create a user first</p> : null}
+      <h4 className="text-2xl">
+        Select a subscription plan and confirm your payment
+      </h4>
+      <div className="flex justify-center mt-2">
+        <button
+          className={`border-2 p-2 outline-none ${
+            priceId === "price_1Iyx9wHhEOvz8JaOSVCF6AJi"
+              ? "border-primary"
+              : "border-txt-secondary"
+          }`}
+          onClick={() => setPriceId("price_1Iyx9wHhEOvz8JaOSVCF6AJi")}
+        >
+          <h1 className="font-semibold text-2xl">Mensual</h1>
+          <p>Normal price</p>
+          <p className="line-through font-thin text-opacity-50">$4.99</p>
+          <p>Launching price</p>
+          <p className="font-thin">$2.50</p>
+        </button>
+        <button
+          className={`border-2 border-collapse p-2 outline-none ${
+            priceId === "price_1Iyx9wHhEOvz8JaOMOYdWrWV"
+              ? "border-primary"
+              : "border-txt-secondary"
+          }`}
+          onClick={() => setPriceId("price_1Iyx9wHhEOvz8JaOMOYdWrWV")}
+        >
+          <h1 className="font-semibold text-2xl">Anual</h1>
+          <p>Normal price</p>
+          <p className="line-through font-thin text-opacity-50">$4.99</p>
+          <p>Launching price</p>
+          <p className="font-thin">$2.50</p>
+        </button>
+      </div>
+      <form className="mt-4" onSubmit={handleSubmit}>
+        <CardElement
+          options={cardOptions}
+          className="text-txt-secondary w-full"
+        />
+        <button
+          className="btn px-2 w-max mx-auto mt-2 table"
+          disabled={!user | (user === "guest")}
+        >
+          Join
+        </button>
+        {!user | (user === "guest") ? (
+          <p className="text-alert w-max mx-auto font-medium">
+            Please create a user first
+          </p>
+        ) : null}
+        {!priceId ? (
+          <p className="text-alert w-max mx-auto font-medium">
+            Please select a plan first
+          </p>
+        ) : null}
       </form>
     </div>
   );

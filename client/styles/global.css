@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url("https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@100;200;300;400;500;600;700&display=swap");
 
 body {
   font-family: "Saira Condensed", -apple-system, BlinkMacSystemFont, Segoe UI,
@@ -84,6 +84,9 @@ body {
 }
 .key-btn-row {
 }
+.signup-proccess-section {
+  @apply bg-secondary text-txt-secondary mx-4 py-4 px-8;
+}
 /* LANDING PAGE */
 .sec-1 {
   background-image: url("https://assets.website-files.com/5faabe4b6f6b4331a5f27952/603fa29994675e4e5487a831_Hero_Original-min-p-500.png");
@@ -96,5 +99,5 @@ body {
 }
 
 p {
-  @apply text-lg;
+  @apply font-extralight;
 }

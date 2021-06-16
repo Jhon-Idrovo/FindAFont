@@ -15,7 +15,7 @@ function NavBar() {
     return <div></div>;
   }
   return (
-    <nav className=" p-2 h-10 flex justify-between items-center  bg-base text-txt-base">
+    <nav className=" p-2 h-10 flex justify-between items-center  bg-base text-txt-base border-b-2 border-secondary">
       <Link href="/">
         <a>Find A Font</a>
       </Link>

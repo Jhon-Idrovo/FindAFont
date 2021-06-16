@@ -9,13 +9,19 @@ function FirebaseAuth() {
   const uiConfig = {
     signInFlow: "popup",
 
-    signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
+    signInOptions: [
+      firebase.auth.EmailAuthProvider.PROVIDER_ID,
+      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+      firebase.auth.GithubAuthProvider.PROVIDER_ID,
+      //firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+    ],
+
     callbacks: {
       signInSuccessWithAuthResult: (auth) => {
         console.log(auth);
         console.log(router);
         //save the user data in case it's calling the component from the sign up page
-        if (router.pathname === "sign-up") {
+        if (router.pathname === "/sign-up") {
           saveUserToFirestore(auth.user);
         }
         //avoid redirects
