@@ -5,7 +5,7 @@ import Head from "next/head";
 import "../styles/global.css";
 import NavBar from "../components/NavBar";
 import { auth, db } from "../lib/firebase";
-import { parseUser, saveUserToFirestore } from "../lib/firebaseUser";
+import { parseUser } from "../lib/firebaseUser";
 
 //stripe
 import { Elements } from "@stripe/react-stripe-js";
@@ -77,3 +77,5 @@ export default function App({ Component, pageProps }) {
     </>
   );
 }
+
+export async function getServerSideProps() {}

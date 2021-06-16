@@ -19,13 +19,6 @@ function useUser() {
         console.error(e);
       });
   };
-  if (user) {
-    db.collection("users")
-      .doc(user.uid)
-      .collection("private")
-      .doc("subscription")
-      .get();
-  }
   return { user, setUser, logOut };
 }
 

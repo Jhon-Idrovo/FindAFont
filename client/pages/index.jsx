@@ -11,6 +11,8 @@ import { db } from "../lib/firebase";
 import useUser from "../hooks/useUser";
 import { useQuery } from "react-query";
 
+import { blacklistFont } from "../lib/firebaseUser";
+
 export default function Home() {
   //fetch fonts
   const GoogleFontsAPIKey = "AIzaSyBURN0QbZlqbqoUPbIKdRhcDkH_Xz2taAs";
@@ -59,14 +61,18 @@ export default function Home() {
       return JSON.parse(JSON.stringify(texts));
     });
   };
-
+  //BLACKLIST FONTS
+  const { user, logOut } = useUser();
   const doNotShowFont = () => {
     setTexts((texts) => {
       texts[activeTextIndex].filters = [
         ...texts[activeTextIndex].filters,
         texts[activeTextIndex].fontIndex,
       ];
-
+      if (user?.subscriptionType === "PRO") {
+        const font = fonts[texts[activeTextIndex].fontIndex];
+        blacklistFont(font, user);
+      }
       //to force re-rendering
       return JSON.parse(JSON.stringify(texts));
     });
@@ -81,7 +87,6 @@ export default function Home() {
     setLiked((prev) => [...prev, texts.map((t) => fonts[t.fontIndex].family)]);
   };
   const [isShowingLiked, setIsShowingLiked] = useState(false);
-  const { user, logOut } = useUser();
   const handleShowLiked = async () => {
     setIsShowingLiked(true);
     try {
@@ -153,14 +158,6 @@ export default function Home() {
             <button onClick={doNotShowFont} className="">
               DON'T SHOW AGAIN
             </button>
-            {/* <select
-            className="bg-base text-txt-base"
-            name="hide-option"
-            id="hide-option"
-            >
-            <option value="never">Don't show again</option>
-            <option value="last">Show last</option>
-          </select> */}
           </div>
           <button
             onClick={() => handleFontChange(-1)}
