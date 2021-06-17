@@ -11,7 +11,7 @@ import { db } from "../lib/firebase";
 import useUser from "../hooks/useUser";
 import { useQuery } from "react-query";
 
-import { blacklistFont } from "../lib/firebaseUser";
+import { blacklistFont, saveLikedFonts } from "../lib/firebaseUser";
 
 export default function Home() {
   //fetch fonts
@@ -89,19 +89,6 @@ export default function Home() {
   const [isShowingLiked, setIsShowingLiked] = useState(false);
   const handleShowLiked = async () => {
     setIsShowingLiked(true);
-    try {
-      const likedFontsCollection = db
-        .collection("users")
-        .doc(user.uid)
-        .collection("likedFonts");
-      liked.map((likedList) =>
-        likedFontsCollection.add({ fontFamilyNames: likedList })
-      );
-    } catch (e) {
-      console.log(
-        "An error happened while saving liked font's data to the database"
-      );
-    }
   };
 
   //TEXTS CONFIG

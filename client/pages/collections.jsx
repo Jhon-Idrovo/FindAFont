@@ -1,21 +1,33 @@
 import { useState, useEffect, useContext } from "react";
 import { db } from "../lib/firebase";
-import { UserContext } from "../lib/UserContext";
-import useUser from "../hooks/useUser";
 import moduleName from "../components/SingIn";
 import SingIn from "../components/SingIn";
 import SubscriptionNeeded from "../components/SubscriptionNeeded";
-
+import useCollections from "../hooks/useCollections";
+import Head from "next/head";
 function Collections() {
-  const { user, logOut } = useUser();
-  const [isLoadingData, setIsLoadingData] = useState(true);
-  const [likedFonts, setLikedFonts] = useState([]);
-
+  const { collections, isError } = useCollections();
   return (
     <div>
-      {user?.subscriptionType ? user.subscriptionType : <SubscriptionNeeded />}
-      {user?.uid}
-      <button onClick={logOut}>Logout</button>
+      <Head>
+        {collections?.map((collection) =>
+          collection.fontFamilyNames.map((fontName) => (
+            <link
+              rel="stylesheet"
+              href={`https://fonts.googleapis.com/css?family=${fontName}`}
+            />
+          ))
+        )}
+      </Head>
+      {collections?.map((collection) => (
+        <div>
+          {collection.fontFamilyNames.map((fontName) => (
+            <h2 className="text-txt-base" style={{ fontFamily: fontName }}>
+              {fontName}
+            </h2>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }
