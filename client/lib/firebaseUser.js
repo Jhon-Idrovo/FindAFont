@@ -73,10 +73,23 @@ export async function saveLikedFonts(fontNames, uid) {
       .collection("users")
       .doc(uid)
       .collection("likedFonts");
-    fontNames.map((likedList) => {
+    //for all font names
+    fontNames.map(async (likedList) => {
       //see if the font already exists
-      likedFontsCollection.doc();
-      likedFontsCollection.add({ fontFamilyNames: likedList });
+      const querySnapshot = await likedFontsCollection
+        .where("fontFamilyNames", "in", [likedList])
+        .get();
+      //there is only one doc in the query
+      const doc = querySnapshot.docs[0];
+      if (doc) {
+        //the selection is already saved. Update the count
+        console.log(doc);
+        const timesLiked = doc.data().timesLiked;
+        doc.ref.update({ timesLiked: timesLiked + 1 });
+      } else {
+        //the selection has been not saved yet
+        likedFontsCollection.add({ fontFamilyNames: likedList, timesLiked: 0 });
+      }
     });
   } catch (e) {
     console.log(

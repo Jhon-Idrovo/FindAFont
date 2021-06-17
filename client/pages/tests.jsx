@@ -5,17 +5,21 @@ import axios from "axios";
 import { db, auth } from "../lib/firebase";
 import { fetchFromAPI } from "../lib/utils";
 import Loading from "../components/Loading";
+import useUser from "../hooks/useUser";
 
 //elements
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-
+import { saveLikedFonts } from "../lib/firebaseUser";
+const likedFonts = [["ABeeZee", "ABeeZee"]];
 function Tests() {
-  const user = auth.currentUser;
+  const { user } = useUser();
   return (
     <div className="h-screen">
-      <Loading>
-        <p className="text-txt-base">Testing</p>
-      </Loading>
+      {user ? (
+        <button onClick={() => saveLikedFonts(likedFonts, user.uid)}>
+          Save
+        </button>
+      ) : null}
     </div>
   );
 }

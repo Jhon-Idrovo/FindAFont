@@ -18,7 +18,7 @@ function LikedFonts({ fonts, goBack }) {
           ))}
         </div>
       ))}
-      {user & (user != "guest") ? (
+      {(user != null) & (user != "guest") ? (
         <button
           onClick={() => saveLikedFonts(fonts, user.id)}
           className="btn block mt-8 px-4 w-max mx-auto"
