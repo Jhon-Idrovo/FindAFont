@@ -7,6 +7,14 @@ const texts = [
     t: "Collections",
     d: "Save your time by storing the fonts that you love to easily access them later without going througth the selection process again.",
   },
+  {
+    t: "Most Liked",
+    d: "Get inspiration seeing what are the fonts that other designers like the most",
+  },
+  {
+    t: "Exluded Fonts",
+    d: "Exlude the fonts that you really don’t like from appearing again. This will be applied to every furure font test. You can remove a font from this exclusion list anytime.",
+  },
 ];
 function SignUp() {
   const { user } = useUser();
@@ -20,7 +28,7 @@ function SignUp() {
           <FunctionalityShowcase {...f} />
         ))}
       </div>
-      <div className="grid grid-cols-2 my-8">
+      <div className="grid grid-cols-2 my-12">
         <div className="signup-proccess-section">
           <div className="rounded-full w-8 h-8 mx-auto grid place-items-center bg-primary text-txt-primary">
             1
@@ -51,11 +59,11 @@ export default SignUp;
 
 function FunctionalityShowcase({ t, d }) {
   return (
-    <div className="bg-secondary mx-6">
+    <div className="bg-secondary mx-6 p-2">
       <h4 className="w-max mx-auto text-xl font-medium text-txt-secondary">
         {t}
       </h4>
-      <p className="text-txt-secondary font-light px-2">{d}</p>
+      <p className="text-txt-secondary font-light ">{d}</p>
     </div>
   );
 }

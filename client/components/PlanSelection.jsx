@@ -65,9 +65,9 @@ export default function PlanSelection() {
 
   return (
     <div>
-      <h4 className="text-2xl">
+      <p className="text-2xl">
         Select a subscription plan and confirm your payment
-      </h4>
+      </p>
       <div className="flex justify-center mt-2">
         <button
           className={`border-2 p-2 outline-none ${
@@ -79,9 +79,9 @@ export default function PlanSelection() {
         >
           <h1 className="font-semibold text-2xl">Mensual</h1>
           <p>Normal price</p>
-          <p className="line-through font-thin text-opacity-50">$4.99</p>
+          <p className="line-through font-thin text-opacity-50">$3.99</p>
           <p>Launching price</p>
-          <p className="font-thin">$2.50</p>
+          <p className="font-thin">$1.50</p>
         </button>
         <button
           className={`border-2 border-collapse p-2 outline-none ${
@@ -93,18 +93,18 @@ export default function PlanSelection() {
         >
           <h1 className="font-semibold text-2xl">Anual</h1>
           <p>Normal price</p>
-          <p className="line-through font-thin text-opacity-50">$4.99</p>
+          <p className="line-through font-thin text-opacity-50">$10.99</p>
           <p>Launching price</p>
-          <p className="font-thin">$2.50</p>
+          <p className="font-thin">$7.50</p>
         </button>
       </div>
-      <form className="mt-4" onSubmit={handleSubmit}>
+      <form className="mt-8" onSubmit={handleSubmit}>
         <CardElement
           options={cardOptions}
           className="text-txt-secondary w-full"
         />
         <button
-          className="btn px-2 w-max mx-auto mt-2 table"
+          className="btn px-6 py-1 w-max mx-auto mt-8 table"
           disabled={!user | (user === "guest")}
         >
           Join

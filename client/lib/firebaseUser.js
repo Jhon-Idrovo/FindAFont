@@ -73,9 +73,11 @@ export async function saveLikedFonts(fontNames, uid) {
       .collection("users")
       .doc(uid)
       .collection("likedFonts");
-    fontNames.map((likedList) =>
-      likedFontsCollection.add({ fontFamilyNames: likedList })
-    );
+    fontNames.map((likedList) => {
+      //see if the font already exists
+      likedFontsCollection.doc();
+      likedFontsCollection.add({ fontFamilyNames: likedList });
+    });
   } catch (e) {
     console.log(
       "An error happened while saving liked font's data to the database"
