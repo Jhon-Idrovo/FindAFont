@@ -100,3 +100,17 @@ body {
 p {
   @apply font-extralight;
 }
+/* CATEGORY FILTERS */
+.filter-item {
+  @apply font-medium text-xl px-2 cursor-pointer relative overflow-visible;
+}
+.filter-on {
+  @apply bg-secondary;
+}
+.filter-tooltip {
+  @apply absolute top-full hidden text-sm bg-base text-txt-base min-w-max px-2 py-1;
+}
+
+.filter-item:hover span {
+  @apply inline;
+}

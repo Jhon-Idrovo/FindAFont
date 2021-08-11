@@ -12,6 +12,7 @@ import useUser from "../hooks/useUser";
 import { useQuery } from "react-query";
 
 import { blacklistFont, saveLikedFonts } from "../lib/firebaseUser";
+import CategoryFilter from "../components/CategoryFilter";
 
 export default function Home() {
   //fetch fonts
@@ -37,6 +38,7 @@ export default function Home() {
     { fontIndex: 0, filters: [] },
   ]);
   const [activeTextIndex, setActiveTextIndex] = useState(0);
+  //changes can be -1 or 1
   const handleFontChange = (change) => {
     setTexts((texts) => {
       const currentText = texts[activeTextIndex];
@@ -62,6 +64,18 @@ export default function Home() {
       }
       texts[activeTextIndex].fontIndex = nextFontIndex;
       //to force re-rendering
+      return JSON.parse(JSON.stringify(texts));
+    });
+  };
+  const handleCategoryFilter = (category) => {
+    //add the category to the filters array on the texts variable if it's in it. Otherwise
+    //remove it
+    setTexts((texts) => {
+      const activeTextFilters = texts[activeTextIndex].filters;
+      activeTextFilters.includes(category)
+        ? activeTextFilters.splice(activeTextFilters.indexOf(category), 1)
+        : activeTextFilters.push(category);
+      //force re-rendering
       return JSON.parse(JSON.stringify(texts));
     });
   };
@@ -272,6 +286,10 @@ export default function Home() {
             } bg-base border-2 border-txt-base`}
           >
             <div className="flex justify-end mx-1 my-0">
+              <CategoryFilter
+                filters={texts[activeTextIndex].filters}
+                handleCategoryFilter={handleCategoryFilter}
+              />
               <button
                 onClick={() => setIsConfigOpen((prev) => !prev)}
                 className="mx-1"
