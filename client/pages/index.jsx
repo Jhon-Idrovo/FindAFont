@@ -31,7 +31,7 @@ export default function Home() {
     error,
     isLoading: isLoadingFonts,
   } = useQuery("fonts", fetchFontsList);
-  //------------------------------------
+  //--------------------TEXT AREAS ----------------
   const [texts, setTexts] = useState([
     { fontIndex: 0, filters: [] },
     { fontIndex: 0, filters: [] },
@@ -51,6 +51,10 @@ export default function Home() {
         currentText.filters.includes(nextFont.category) ||
         currentText.filters.includes(nextFontIndex)
       ) {
+        //if the font is excluded execute the chenge again
+        //first we need to let the setTexts function call terminate.
+        //To do this without killing the recursive call, we use a setTimeot to
+        //take the call out of the tread.
         setTimeout(() => {
           handleFontChange(change);
         }, 0);
