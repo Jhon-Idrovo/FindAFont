@@ -53,12 +53,13 @@ export default function Home() {
         currentText.filters.includes(nextFont.category) ||
         currentText.filters.includes(nextFontIndex)
       ) {
-        //if the font is excluded execute the chenge again
-        //first we need to let the setTexts function call terminate.
+        //if the font is excluded execute the chenge again. To do this wee need to add
+        //one to the change to advance in the fonts index by two.
+        //First we need to let the setTexts function call terminate.
         //To do this without killing the recursive call, we use a setTimeot to
         //take the call out of the tread.
         setTimeout(() => {
-          handleFontChange(change);
+          handleFontChange(change + 1);
         }, 0);
         return texts;
       }
@@ -280,7 +281,7 @@ export default function Home() {
             Next
           </button>
           <div
-            className={`flex flex-col absolute  ${
+            className={`flex flex-col absolute overflow-y-scroll ${
               isFullScreen
                 ? "top-0 bottom-0 right-0 left-0 z-10"
                 : "top-16 bottom-16 right-24 left-24"

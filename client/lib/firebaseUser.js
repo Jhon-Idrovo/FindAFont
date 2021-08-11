@@ -61,11 +61,12 @@ export async function blacklistFont(fontObj, user) {
     .set({ ...fontObj });
 }
 /**
- * @param  {Array} fontNames an array of arrays [[font1, font2],[]]. Each inner array 
+ * @param  {Array} fontNames an array of arrays [[font1, font2],[]]. Each inner array
  * corresponds to a pair of liked fonts
  * @param  {string} uid
  * Save the list of liked fonts to Firestore db
  * TODO: what if the user has already saved the font match?
+ * this should be handled by the server
  */
 export async function saveLikedFonts(fontNames, uid) {
   try {
@@ -93,7 +94,8 @@ export async function saveLikedFonts(fontNames, uid) {
     });
   } catch (e) {
     console.log(
-      "An error happened while saving liked font's data to the database", e
+      "An error happened while saving liked font's data to the database",
+      e
     );
   }
 }
