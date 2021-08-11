@@ -87,6 +87,7 @@ export default function Home() {
         ...texts[activeTextIndex].filters,
         texts[activeTextIndex].fontIndex,
       ];
+      //if the user is PRO blacklist the font on the server too
       if (user?.subscriptionType === "PRO") {
         const font = fonts[texts[activeTextIndex].fontIndex];
         blacklistFont(font, user);

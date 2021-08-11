@@ -5,7 +5,14 @@ function LikedFonts({ fonts, goBack }) {
   const { user } = useUser();
   console.log(fonts);
   if (fonts.length === 0) {
-    return <div>You have't liked any font</div>;
+    return (
+      <div className="text-txt-base text-center">
+        You have't liked any font.. yet
+        <button className="btn px-2 py-1 block mx-auto " onClick={goBack}>
+          Go for it!
+        </button>
+      </div>
+    );
   }
   return (
     <div>
