@@ -55,7 +55,7 @@ export async function saveUserToFirestore(user) {
  * TODO: Make it work with the server, not the db directly
  */
 export async function blacklistFont(fontObj, user) {
-  fetchFromAPI("/fots/blacklist", { method: "POST", body: { fontObj } });
+  fetchFromAPI("/fonts/blacklist", { method: "POST", body: { fontObj } });
 }
 /**
  * @param  {Array} fontNames an array of arrays [[font1, font2],[]]. Each inner array

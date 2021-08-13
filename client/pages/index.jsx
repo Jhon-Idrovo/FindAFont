@@ -11,6 +11,7 @@ import { useQuery } from "react-query";
 import { blacklistFont, getBlacklistedFonts } from "../lib/firebaseUser";
 import CategoryFilter from "../components/CategoryFilter";
 import { fetchFontsList } from "../lib/utils";
+import useBlacklistedFonts from "../hooks/useBlacklistedFonts";
 
 export default function Home() {
   //fetch google fonts
@@ -22,11 +23,14 @@ export default function Home() {
   //--------------------TEXT AREAS ----------------
   const { user, logOut, isLoadingUser } = useUser();
   //once the user is loaded (if there's one, we need its blacklisted fonts)
-  user ? getBlacklistedFonts(user.uid) : null;
-
+  const {
+    error: blFontsError,
+    fonts: blFonts,
+    isLoading: isLoadignBlFonts,
+  } = useBlacklistedFonts();
   const [texts, setTexts] = useState([
-    { fontIndex: 0, filters: [] },
-    { fontIndex: 0, filters: [] },
+    { fontIndex: 0, filters: blFonts ? blFonts : [] },
+    { fontIndex: 0, filters: blFonts ? blFonts : [] },
   ]);
   const [activeTextIndex, setActiveTextIndex] = useState(0);
   //changes can be -1 or 1

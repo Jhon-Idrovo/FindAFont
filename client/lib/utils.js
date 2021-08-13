@@ -17,7 +17,7 @@ export async function fetchFromAPI(endpointURL, opts) {
   //the token's expiration time is short so we need to generate
   //a new one after each request
   const token = user ? await user.getIdToken() : "";
-  console.log(token);
+  console.log("request roken", token);
   const res = await axios.request({
     method: method ? method : "POST",
     url: `${API}${endpointURL}`,

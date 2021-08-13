@@ -4,9 +4,11 @@ import { fetchFromAPI } from "../lib/utils";
 //elements
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import useUser from "../hooks/useUser";
+import { useRouter } from "next/router";
 
 export default function PlanSelection() {
-  const { user } = useUser();
+  const router = useRouter();
+  const { user, setUser } = useUser();
   const [priceId, setPriceId] = useState();
   const elemets = useElements();
   const stripe = useStripe();
@@ -32,7 +34,7 @@ export default function PlanSelection() {
       console.log(error);
       return;
     } else {
-      const { latest_invoice } = await fetchFromAPI("subscriptions/create", {
+      const { latest_invoice } = await fetchFromAPI("/subscriptions/create", {
         body: { priceId, paymentMethod: paymentMethod.id },
         method: "POST",
       });
@@ -58,6 +60,8 @@ export default function PlanSelection() {
           } else {
             //success
             alert("You are subscribed");
+            setUser((prev) => ({ ...prev, subscriptionType: "PRO" }));
+            router.push("/");
           }
         }
       }
