@@ -4,41 +4,38 @@ import { useEffect, useState } from "react";
 import TextArea from "../components/TextArea";
 import LikedFonts from "../components/LikedFonts";
 import Loading from "../components/Loading";
-import useFonts from "../hooks/useFonts";
 
-import axios from "axios";
-import { db } from "../lib/firebase";
 import useUser from "../hooks/useUser";
 import { useQuery } from "react-query";
 
-import { blacklistFont, saveLikedFonts } from "../lib/firebaseUser";
+import { blacklistFont, getBlacklistedFonts } from "../lib/firebaseUser";
 import CategoryFilter from "../components/CategoryFilter";
+import { fetchFontsList } from "../lib/utils";
 
 export default function Home() {
-  //fetch fonts
-  const GoogleFontsAPIKey = "AIzaSyBURN0QbZlqbqoUPbIKdRhcDkH_Xz2taAs";
-  async function fetchFontsList() {
-    const res = await axios.get(
-      `https://www.googleapis.com/webfonts/v1/webfonts?key=${GoogleFontsAPIKey}`
-    );
-    if (res.status === 200) {
-      return res.data.items;
-    } else {
-      throw Error("Something went wring while fetching the fonts");
-    }
-  }
+  //fetch google fonts
   const {
     data: fonts,
     error,
     isLoading: isLoadingFonts,
   } = useQuery("fonts", fetchFontsList);
   //--------------------TEXT AREAS ----------------
+  const { user, logOut, isLoadingUser } = useUser();
+  //once the user is loaded (if there's one, we need its blacklisted fonts)
+  user ? getBlacklistedFonts(user.uid) : null;
+
   const [texts, setTexts] = useState([
     { fontIndex: 0, filters: [] },
     { fontIndex: 0, filters: [] },
   ]);
   const [activeTextIndex, setActiveTextIndex] = useState(0);
   //changes can be -1 or 1
+  /**
+   * Get the next font, compare it againt the filters, if valid, apply it setting the value
+   * of the active text area to the new font.
+   * Otherwise make a recursive call to handleFontChange with a change of +2.
+   * @param {-1 or 1} change Only in the case of recursive calls the value of change will be 2
+   */
   const handleFontChange = (change) => {
     setTexts((texts) => {
       const currentText = texts[activeTextIndex];
@@ -53,13 +50,13 @@ export default function Home() {
         currentText.filters.includes(nextFont.category) ||
         currentText.filters.includes(nextFontIndex)
       ) {
-        //if the font is excluded execute the chenge again. To do this wee need to add
-        //one to the change to advance in the fonts index by two.
+        //if the font is excluded execute the chenge again. To do this wee need to
+        //make the change two times.
         //First we need to let the setTexts function call terminate.
         //To do this without killing the recursive call, we use a setTimeot to
         //take the call out of the tread.
         setTimeout(() => {
-          handleFontChange(change + 1);
+          handleFontChange(change * 2);
         }, 0);
         return texts;
       }
@@ -68,6 +65,10 @@ export default function Home() {
       return JSON.parse(JSON.stringify(texts));
     });
   };
+  /**
+   * Removes or adds the category to the active text area filters accordingly
+   * @param {string} category one of the 5 google font categories
+   */
   const handleCategoryFilter = (category) => {
     //add the category to the filters array on the texts variable if it's in it. Otherwise
     //remove it
@@ -80,9 +81,12 @@ export default function Home() {
       return JSON.parse(JSON.stringify(texts));
     });
   };
-  //BLACKLIST FONTS
-  const { user, logOut, isLoadingUser } = useUser();
-  const doNotShowFont = () => {
+  //BLACKLIST FONT
+  /**
+   * Put the font on the filters. If the user is pro
+   * blacklist the font asynchronously on the server too
+   */
+  function doNotShowFont() {
     setTexts((texts) => {
       texts[activeTextIndex].filters = [
         ...texts[activeTextIndex].filters,
@@ -98,13 +102,19 @@ export default function Home() {
     });
     //advance to the next font
     handleFontChange(+1);
-  };
+  }
 
   //SAVE AND SHOW LIKED FONTS
   const [liked, setLiked] = useState([]);
   const saveFonts = () => {
     //save the current font(s) when "SAVE THIS" is pressed
     setLiked((prev) => [...prev, texts.map((t) => fonts[t.fontIndex].family)]);
+  };
+  const handleRemoveFont = (likedIndex) => {
+    setLiked((prev) => {
+      prev.splice(likedIndex, 1);
+      return JSON.parse(JSON.stringify(prev));
+    });
   };
   const [isShowingLiked, setIsShowingLiked] = useState(false);
   const handleShowLiked = async () => {
@@ -114,10 +124,6 @@ export default function Home() {
   //TEXTS CONFIG
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [config, setConfig] = useState({ bgCol: "#FFFFFF", txtCol: "#000000" });
-  const changeTxtCol = (e) => {
-    const newCol = e.target.value;
-    setConfig((prev) => ({ ...prev, txtCol: newCol }));
-  };
   const handleConfigSubmit = (e) => {
     e.preventDefault();
     console.log(e);
@@ -125,7 +131,20 @@ export default function Home() {
     const bgCol = e.target[1].value;
     setConfig({ bgCol, txtCol });
   };
-
+  useEffect(() => {
+    function clickOutsideHandler(e) {
+      if (
+        e.currentTarget.id !== "config-menu" &&
+        e.currentTarget.id !== "config-menu-btn"
+      ) {
+        setIsConfigOpen(false);
+      }
+    }
+    document.addEventListener("click", clickOutsideHandler);
+    return () => {
+      document.removeEventListener("click", clickOutsideHandler);
+    };
+  }, []);
   const [isFullScreen, setIsFullScreen] = useState(false);
 
   //SETTING UP LISTENERS FOR THE KEYS
@@ -167,7 +186,11 @@ export default function Home() {
         ))}
       </Head>
       {isShowingLiked ? (
-        <LikedFonts fonts={liked} goBack={() => setIsShowingLiked(false)} />
+        <LikedFonts
+          fonts={liked}
+          goBack={() => setIsShowingLiked(false)}
+          handleRemoveFont={handleRemoveFont}
+        />
       ) : (
         <main className="fixed top-10 bottom-0 right-0 left-0 text-txt-base bg-base">
           <div className="absolute top-6 w-full flex flex-col items-center">
@@ -195,7 +218,6 @@ export default function Home() {
 		c18.572,0,33.691,15.114,33.691,33.688V304.122z"
                   />
                 </g>
-                >
               </svg>
             </button>
           </div>
@@ -295,10 +317,12 @@ export default function Home() {
               <button
                 onClick={() => setIsConfigOpen((prev) => !prev)}
                 className="mx-1"
+                id="config-menu-btn"
               >
                 <i class="fas fa-ellipsis-h"></i>
               </button>
               <ul
+                id="config-menu"
                 className={`absolute top-6 right-0 overflow-hidden transition-all bg-base ${
                   isConfigOpen ? "max-h-screen" : "max-h-0"
                 }`}

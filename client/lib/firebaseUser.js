@@ -1,4 +1,5 @@
 import { db } from "../lib/firebase";
+import { fetchFromAPI } from "./utils";
 /**
  * @param  {} user
  * Binds Firebase user subscription data stored in Firestore
@@ -14,7 +15,7 @@ export async function parseUser(user) {
       .get();
     console.log(subscription.data());
 
-    return { ...user, ...subscription.data() };
+    return { ...user, subscriptionType: false, ...subscription.data() };
   } catch (e) {
     console.log(e);
     return { ...user, subscriptionType: false };
@@ -50,15 +51,11 @@ export async function saveUserToFirestore(user) {
  * We can't blacklist a font two times because
  * that information is taken into account to show the
  * fonts in future uses
+ *
+ * TODO: Make it work with the server, not the db directly
  */
 export async function blacklistFont(fontObj, user) {
-  const { uid } = user;
-
-  db.collection("users")
-    .doc(uid)
-    .collection("unlikedFonts")
-    .doc(fontObj.family)
-    .set({ ...fontObj });
+  fetchFromAPI("/fots/blacklist", { method: "POST", body: { fontObj } });
 }
 /**
  * @param  {Array} fontNames an array of arrays [[font1, font2],[]]. Each inner array
@@ -69,33 +66,27 @@ export async function blacklistFont(fontObj, user) {
  * this should be handled by the server
  */
 export async function saveLikedFonts(fontNames, uid) {
+  fetchFromAPI("/fonts/save-liked", { body: { fontNames } });
+}
+/**
+ *
+ * @param {string} uid
+ * @returns a list of blacklisted fonts ready for use as filters: ["fontFamily",...]
+ */
+export async function getBlacklistedFonts(uid) {
   try {
-    const likedFontsCollection = db
+    const blFonts = await db
       .collection("users")
       .doc(uid)
-      .collection("likedFonts");
-    //for all font names
-    fontNames.map(async (likedList) => {
-      //see if the font already exists
-      const querySnapshot = await likedFontsCollection
-        .where("fontFamilyNames", "in", [likedList])
-        .get();
-      //there is only one doc in the query
-      const doc = querySnapshot.docs[0];
-      if (doc) {
-        //the selection is already saved. Update the count
-        console.log(doc);
-        const timesLiked = doc.data().timesLiked;
-        doc.ref.update({ timesLiked: timesLiked + 1 });
-      } else {
-        //the selection has been not saved yet
-        likedFontsCollection.add({ fontFamilyNames: likedList, timesLiked: 0 });
-      }
-    });
-  } catch (e) {
+      .collection("unlikedFonts")
+      .get();
+    console.log(blFonts);
+    return blFonts;
+  } catch (error) {
     console.log(
-      "An error happened while saving liked font's data to the database",
-      e
+      "An error happened while fetching the blacklisted fonts",
+      error
     );
+    return [];
   }
 }

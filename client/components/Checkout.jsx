@@ -9,7 +9,7 @@ function Checkout() {
 
   const handleCheckout = async () => {
     //Get the checkout session id
-    const { id: sessionId } = await fetchFromAPI("checkout", {
+    const { id: sessionId } = await fetchFromAPI("/subscriptions/create", {
       body: { priceId },
     });
     console.log(sessionId);

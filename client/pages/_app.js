@@ -4,7 +4,7 @@ import Head from "next/head";
 //locals
 import "../styles/global.css";
 import NavBar from "../components/NavBar";
-import { auth, db } from "../lib/firebase";
+import { auth } from "../lib/firebase";
 import { parseUser } from "../lib/firebaseUser";
 
 //stripe

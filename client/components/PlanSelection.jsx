@@ -32,8 +32,9 @@ export default function PlanSelection() {
       console.log(error);
       return;
     } else {
-      const { latest_invoice } = await fetchFromAPI("subscription/create", {
+      const { latest_invoice } = await fetchFromAPI("subscriptions/create", {
         body: { priceId, paymentMethod: paymentMethod.id },
+        method: "POST",
       });
 
       //the subscription contains the invoice with the payment intent that tells if the payment has been made

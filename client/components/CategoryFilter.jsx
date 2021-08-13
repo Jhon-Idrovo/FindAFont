@@ -21,7 +21,7 @@ function CategoryFilter({ filters, handleCategoryFilter }) {
           onClick={() => handleCategoryFilter(category)}
         >
           F
-          <span className="filter-tooltip" style={{ fontFamily: exp }}>
+          <span className="hidden-tooltip" style={{ fontFamily: exp }}>
             {category}
           </span>
         </h2>
